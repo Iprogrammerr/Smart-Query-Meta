@@ -4,14 +4,27 @@ import com.iprogrammerr.smart.query.QueryFactory;
 
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MetaTable {
 
+    private static final Map<String, String> TYPES_MAPPING = new HashMap<>();
     private static final String CLASS_PARTS_SEPARATOR = ".";
     private static final String NAMES_SEPARATOR = "_";
+
+    static {
+        TYPES_MAPPING.put("Boolean", "boolean");
+        TYPES_MAPPING.put("Byte", "byte");
+        TYPES_MAPPING.put("Short", "short");
+        TYPES_MAPPING.put("Integer", "int");
+        TYPES_MAPPING.put("Long", "long");
+        TYPES_MAPPING.put("Float", "float");
+        TYPES_MAPPING.put("Double", "double");
+    }
+
     private final QueryFactory factory;
     private final String table;
 
@@ -35,7 +48,7 @@ public class MetaTable {
                     String type = typeName(meta.getColumnClassName(i + 1));
                     ft.put(field, type);
                 }
-                return new MetaData(fieldName(table, true), columnLabels, ft);
+                return new MetaData(table, fieldName(table, true), columnLabels, ft);
             });
     }
 
@@ -66,7 +79,7 @@ public class MetaTable {
         } else {
             type = className;
         }
-        return type;
+        return TYPES_MAPPING.getOrDefault(type, type);
     }
 
 }

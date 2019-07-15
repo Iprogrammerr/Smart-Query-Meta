@@ -21,7 +21,8 @@ public class App {
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage());
         List<String> tables = new Tables(setup.connection()).all();
 
-        if (!new File(configuration.classesPath()).mkdirs()) {
+        File classesFile = new File(configuration.classesPath());
+        if (!(classesFile.exists() || classesFile.mkdirs())) {
             throw new RuntimeException(String.format("Can't create necessary %s directory",
                 configuration.classesPath()));
         }
@@ -30,10 +31,19 @@ public class App {
             System.out.println("TABLE: " + t);
             MetaData meta = new MetaTable(queryFactory, t).data();
             String representation = tablesFactory.newRepresentation(meta);
-            Files.write(new File(configuration.classesPath(), meta.className + ".java").toPath(),
+            Files.write(new File(classesFile, meta.className + ".java").toPath(),
                 representation.getBytes());
             System.out.println(representation);
             System.out.println();
         }
+
+//        long id = queryFactory.newQuery().dsl()
+//            .insertInto(Author.TABLE)
+//            .columns(Author.NAME, Author.SURNAME, Author.ALIAS, Author.ALIVE)
+//            .values("Adam", "Mickiewicz", "Wieszcz", false)
+//            .query()
+//            .executeReturningId();
+//n Author.fromResult(r, "aid", Author.NAME, Author.SURNAME, Author.ALIAS, Author.ALIVE);
+// }
     }
 }
