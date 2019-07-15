@@ -9,6 +9,7 @@ public class Configuration {
     public static final String DATABASE_USER = "database.user";
     public static final String DATABASE_PASSWORD = "database.password";
     public static final String JDBC_URL = "jdbc.url";
+    public static final String CLASSES_PACKAGE = "classes.package";
     public static final String CLASSES_PATH = "classes.path";
     private final Properties properties;
 
@@ -41,6 +42,10 @@ public class Configuration {
 
     public String jdbcUrl() {
         return notNull(JDBC_URL);
+    }
+
+    public String classesPackage() {
+        return notNull(CLASSES_PACKAGE);
     }
 
     public String classesPath() {

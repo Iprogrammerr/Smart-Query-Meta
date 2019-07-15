@@ -20,7 +20,6 @@ public class MetaTable {
         this.table = table;
     }
 
-
     public MetaData data() {
         return factory.newQuery().dsl()
             .selectAll().from(table).limit(1)
