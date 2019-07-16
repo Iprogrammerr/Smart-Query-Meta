@@ -47,4 +47,8 @@ public class Author {
 		}
 		return list;
 	}
+
+	public static List<Author> fromListResult(ResultSet result) throws Exception {
+		return fromListResult(result, ID, NAME, SURNAME, ALIAS, ALIVE);
+	}
 }

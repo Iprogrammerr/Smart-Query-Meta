@@ -112,6 +112,8 @@ public class TableRepresentationFactory {
             .append(EMPTY_LINE)
             .append(singleFactory(data))
             .append(EMPTY_LINE)
+            .append(aliasedListFactory(data))
+            .append(EMPTY_LINE)
             .append(listFactory(data))
             .toString();
     }
@@ -198,13 +200,26 @@ public class TableRepresentationFactory {
         return name + FACTORY_ARG_SUFFIX;
     }
 
-    private String listFactory(MetaData data) {
+    private String aliasedListFactory(MetaData data) {
         return new StringBuilder()
             .append(factoryPrefix(true, data.className))
             .append(aliasedFactoryArgs(data.fieldsTypes))
             .append(END_BRACKET).append(" ").append(THROWS_EXCEPTION)
             .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE)
             .append(listMapping(data))
+            .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
+            .toString();
+    }
+
+    private String listFactory(MetaData data) {
+        return new StringBuilder()
+            .append(factoryPrefix(true, data.className))
+            .append(RESULT_SET).append(" ").append(RESULT_SET_ARG)
+            .append(END_BRACKET).append(" ").append(THROWS_EXCEPTION)
+            .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE)
+            .append(DOUBLE_TAB).append("return ")
+            .append(factoryInvocation(true, RESULT_SET_ARG, data.columnsLabels.stream()
+                .map(String::toUpperCase).collect(Collectors.toList()))).append(";")
             .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
             .toString();
     }

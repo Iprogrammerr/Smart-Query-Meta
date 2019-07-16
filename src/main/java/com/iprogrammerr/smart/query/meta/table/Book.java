@@ -43,4 +43,8 @@ public class Book {
 		}
 		return list;
 	}
+
+	public static List<Book> fromListResult(ResultSet result) throws Exception {
+		return fromListResult(result, ID, AUTHOR_ID, TITLE, YEAR_OF_PUBLICATION);
+	}
 }
