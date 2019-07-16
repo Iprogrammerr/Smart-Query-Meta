@@ -1,5 +1,6 @@
 package com.iprogrammerr.smart.query.meta;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class TableRepresentationFactory {
 
+    private static final int MAX_ARG_LINE_SIZE = 60;
     private static final String PACKAGE_PREFIX = "package";
     private static final List<String> IMPORTS = Arrays.asList("import java.sql.ResultSet;", "import java.util.List;",
         "import java.util.ArrayList;");
@@ -33,7 +35,7 @@ public class TableRepresentationFactory {
     private static final String FACTORY_NAME = "fromResult";
     private static final String LIST_FACTORY_NAME = "fromListResult";
     private static final String RESULT_SET = "ResultSet";
-    private static final String RESULT_SET_ARG = "result";
+    private static final String RESULT_SET_ARG_NAME = "result";
     private static final String THROWS_EXCEPTION = "throws Exception";
     private static final String FACTORY_ARG_SUFFIX = "Label";
     private static final String LIST_NAME = "list";
@@ -83,7 +85,7 @@ public class TableRepresentationFactory {
 
     private String constant(String name, String value) {
         return new StringBuilder().append(TAB).append(CONSTANTS_MODIFIED)
-            .append(" String ").append(name)
+            .append(" ").append(STRING).append(" ").append(name)
             .append(" = ").append("\"").append(value).append("\"")
             .append(SEMICOLON).append(NEW_LINE)
             .toString();
@@ -92,17 +94,30 @@ public class TableRepresentationFactory {
     private String constructor(String className, Map<String, String> fieldsTypes) {
         StringBuilder builder = new StringBuilder();
         builder.append(TAB).append(PUBLIC_MODIFIER).append(" ").append(className).append(START_BRACKET);
-        for (Map.Entry<String, String> e : fieldsTypes.entrySet()) {
-            builder.append(e.getValue()).append(" ").append(e.getKey()).append(COMMA).append(" ");
-        }
-        int length = builder.length();
-        builder.replace(length - 2, length, END_BRACKET);
-        builder.append(" ").append(START_CURLY_BRACKET);
+        List<String> args = fieldsTypes.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
+            .collect(Collectors.toList());
+        builder.append(methodArgs(args)).append(END_BRACKET).append(" ").append(START_CURLY_BRACKET);
         for (String f : fieldsTypes.keySet()) {
             builder.append(NEW_LINE).append(DOUBLE_TAB)
                 .append(THIS).append(DOT).append(f).append(EQUAL).append(f).append(SEMICOLON);
         }
         return builder.append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET).toString();
+    }
+
+    private String methodArgs(List<String> args) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(args.get(0));
+        int previousLineLength = 0;
+        for (int i = 1; i < args.size(); i++) {
+            builder.append(COMMA).append(" ");
+            if ((builder.length() - previousLineLength) > MAX_ARG_LINE_SIZE) {
+                builder.append(NEW_LINE).append(DOUBLE_TAB);
+                previousLineLength = builder.length();
+            }
+            builder.append(args.get(i));
+
+        }
+        return builder.toString();
     }
 
     private String factories(MetaData data) {
@@ -129,24 +144,23 @@ public class TableRepresentationFactory {
                 resultSetInvocation(e.getValue(), aliased(e.getKey()))))
                 .append(NEW_LINE);
         }
-        builder.append(DOUBLE_TAB).append("return new ").append(data.className).append(START_BRACKET);
-        for (String f : data.fieldsTypes.keySet()) {
-            builder.append(f).append(COMMA).append(" ");
-        }
-        int length = builder.length();
-        builder.replace(length - 2, length, "");
-        return builder.append(END_BRACKET).append(SEMICOLON)
+        return builder.append(DOUBLE_TAB).append("return new ").append(data.className).append(START_BRACKET)
+            .append(methodArgs(new ArrayList<>(data.fieldsTypes.keySet())))
+            .append(END_BRACKET).append(SEMICOLON)
             .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
             .toString();
     }
 
     private String aliasedFactoryArgs(Map<String, String> fieldsTypes) {
-        StringBuilder builder = new StringBuilder()
-            .append(RESULT_SET).append(" ").append(RESULT_SET_ARG);
-        for (String f : fieldsTypes.keySet()) {
-            builder.append(COMMA).append(" ").append(STRING).append(" ").append(aliased(f));
-        }
-        return builder.toString();
+        List<String> args = new ArrayList<>();
+        args.add(resultSetArg());
+        args.addAll(fieldsTypes.keySet().stream().map(f -> STRING + " " + aliased(f))
+            .collect(Collectors.toList()));
+        return methodArgs(args);
+    }
+
+    private String resultSetArg() {
+        return RESULT_SET + " " + RESULT_SET_ARG_NAME;
     }
 
     private List<String> aliasedArgsNames(Map<String, String> fieldsTypes) {
@@ -170,19 +184,19 @@ public class TableRepresentationFactory {
     }
 
     private String singleFactory(MetaData data) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(factoryPrefix(false, data.className))
-            .append(RESULT_SET).append(" ").append(RESULT_SET_ARG)
+        return new StringBuilder()
+            .append(factoryPrefix(false, data.className))
+            .append(RESULT_SET).append(" ").append(RESULT_SET_ARG_NAME)
             .append(END_BRACKET).append(" ").append(THROWS_EXCEPTION)
-            .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE);
-        return builder.append(DOUBLE_TAB).append("return ")
-            .append(constantsFactoryInvocation(false, data.columnsLabels))
+            .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE)
+            .append(DOUBLE_TAB).append("return ")
+            .append(constantsFactoryInvocation(data.columnsLabels))
             .append(SEMICOLON).append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
             .toString();
     }
 
-    private String constantsFactoryInvocation(boolean list, List<String> columnsLabels) {
-        return factoryInvocation(list, RESULT_SET_ARG, columnsLabels.stream().map(String::toUpperCase)
+    private String constantsFactoryInvocation(List<String> columnsLabels) {
+        return factoryInvocation(false, RESULT_SET_ARG_NAME, columnsLabels.stream().map(String::toUpperCase)
             .collect(Collectors.toList()));
     }
 
@@ -214,11 +228,11 @@ public class TableRepresentationFactory {
     private String listFactory(MetaData data) {
         return new StringBuilder()
             .append(factoryPrefix(true, data.className))
-            .append(RESULT_SET).append(" ").append(RESULT_SET_ARG)
+            .append(RESULT_SET).append(" ").append(RESULT_SET_ARG_NAME)
             .append(END_BRACKET).append(" ").append(THROWS_EXCEPTION)
             .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE)
             .append(DOUBLE_TAB).append("return ")
-            .append(factoryInvocation(true, RESULT_SET_ARG, data.columnsLabels.stream()
+            .append(factoryInvocation(true, RESULT_SET_ARG_NAME, data.columnsLabels.stream()
                 .map(String::toUpperCase).collect(Collectors.toList()))).append(";")
             .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
             .toString();
@@ -229,19 +243,19 @@ public class TableRepresentationFactory {
             .append(DOUBLE_TAB)
             .append(list(meta.className)).append(" ").append(LIST_NAME).append(EQUAL).append(INITIALIZED_LIST)
             .append(NEW_LINE).append(DOUBLE_TAB)
-            .append("while (").append(RESULT_SET_ARG).append(DOT).append("next()").append(") ")
+            .append("while (").append(RESULT_SET_ARG_NAME).append(DOT).append("next()").append(") ")
             .append(START_CURLY_BRACKET)
             .append(NEW_LINE).append(DOUBLE_TAB).append(TAB)
-            .append(LIST_NAME).append(".add(").append(factoryInvocation(false, RESULT_SET_ARG,
+            .append(LIST_NAME).append(".add(").append(factoryInvocation(false, RESULT_SET_ARG_NAME,
                 aliasedArgsNames(meta.fieldsTypes))).append(");")
             .append(NEW_LINE).append(DOUBLE_TAB).append(END_CURLY_BRACKET)
-            .append(NEW_LINE).append(DOUBLE_TAB).append("return list;")
+            .append(NEW_LINE).append(DOUBLE_TAB).append("return ").append(LIST_NAME).append(SEMICOLON)
             .toString();
     }
 
     private String resultSetInvocation(String type, String key) {
         return new StringBuilder()
-            .append(RESULT_SET_ARG).append(DOT).append("get")
+            .append(RESULT_SET_ARG_NAME).append(DOT).append("get")
             .append(capitalized(type))
             .append(START_BRACKET)
             .append(key)
