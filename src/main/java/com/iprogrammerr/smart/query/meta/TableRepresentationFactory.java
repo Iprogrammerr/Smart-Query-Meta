@@ -3,6 +3,7 @@ package com.iprogrammerr.smart.query.meta;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TableRepresentationFactory {
 
@@ -35,6 +36,7 @@ public class TableRepresentationFactory {
     private static final String RESULT_SET_ARG = "result";
     private static final String THROWS_EXCEPTION = "throws Exception";
     private static final String FACTORY_ARG_SUFFIX = "Label";
+    private static final String PLUS = "+";
 
     private final String packageName;
 
@@ -149,14 +151,26 @@ public class TableRepresentationFactory {
         builder.append(factoryPrefix(data.className));
         builder.append(END_BRACKET).append(" ").append(THROWS_EXCEPTION)
             .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE);
-        builder.append(DOUBLE_TAB).append("return ").append(FACTORY_NAME).append(START_BRACKET)
-            .append(RESULT_SET_ARG);
-        for (String a : data.columnsLabels) {
-            builder.append(COMMA).append(" ").append(a.toUpperCase());
-        }
-        return builder.append(END_BRACKET).append(SEMICOLON)
+        return builder.append(DOUBLE_TAB).append("return ")
+            .append(constantsFactoryInvocation(data.columnsLabels))
             .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
             .toString();
+    }
+
+    private String constantsFactoryInvocation(List<String> columnsLabels) {
+        return factoryInvocation(columnsLabels.stream().map(String::toUpperCase)
+            .collect(Collectors.toList()));
+    }
+
+    private String factoryInvocation(List<String> args) {
+        StringBuilder builder = new StringBuilder()
+            .append(FACTORY_NAME).append(START_BRACKET)
+            .append(args.get(0));
+        for (int i = 1; i < args.size(); i++) {
+            builder.append(COMMA).append(" ").append(args.get(i));
+        }
+        builder.append(END_BRACKET).append(SEMICOLON);
+        return builder.toString();
     }
 
     private String aliased(String name) {

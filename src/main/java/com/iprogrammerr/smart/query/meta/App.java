@@ -37,13 +37,5 @@ public class App {
             System.out.println();
         }
 
-//        long id = queryFactory.newQuery().dsl()
-//            .insertInto(Author.TABLE)
-//            .columns(Author.NAME, Author.SURNAME, Author.ALIAS, Author.ALIVE)
-//            .values("Adam", "Mickiewicz", "Wieszcz", false)
-//            .query()
-//            .executeReturningId();
-//n Author.fromResult(r, "aid", Author.NAME, Author.SURNAME, Author.ALIAS, Author.ALIVE);
-// }
     }
 }
