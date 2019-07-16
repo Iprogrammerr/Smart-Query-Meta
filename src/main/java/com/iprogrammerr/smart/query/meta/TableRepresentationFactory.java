@@ -158,16 +158,16 @@ public class TableRepresentationFactory {
     }
 
     private String constantsFactoryInvocation(List<String> columnsLabels) {
-        return factoryInvocation(columnsLabels.stream().map(String::toUpperCase)
+        return factoryInvocation(RESULT_SET_ARG, columnsLabels.stream().map(String::toUpperCase)
             .collect(Collectors.toList()));
     }
 
-    private String factoryInvocation(List<String> args) {
+    private String factoryInvocation(String arg, List<String> args) {
         StringBuilder builder = new StringBuilder()
             .append(FACTORY_NAME).append(START_BRACKET)
-            .append(args.get(0));
-        for (int i = 1; i < args.size(); i++) {
-            builder.append(COMMA).append(" ").append(args.get(i));
+            .append(arg);
+        for (String a : args) {
+            builder.append(COMMA).append(" ").append(a);
         }
         builder.append(END_BRACKET).append(SEMICOLON);
         return builder.toString();
