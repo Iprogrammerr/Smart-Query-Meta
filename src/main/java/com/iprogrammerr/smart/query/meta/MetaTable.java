@@ -42,18 +42,18 @@ public class MetaTable {
                 List<String> columnLabels = new ArrayList<>();
                 Map<String, String> ft = new LinkedHashMap<>();
                 ResultSetMetaData meta = r.getMetaData();
-                for (int i = 0; i < meta.getColumnCount(); i++) {
-                    String label = meta.getColumnLabel(i + 1);
+                for (int i = 1; i <= meta.getColumnCount(); i++) {
+                    String label = meta.getColumnLabel(i);
                     columnLabels.add(label);
-                    String field = fieldName(label, false);
-                    String type = typeName(meta.getColumnClassName(i + 1));
+                    String field = name(label, false);
+                    String type = typeName(meta.getColumnClassName(i));
                     ft.put(field, type);
                 }
-                return new MetaData(table, fieldName(table, true), columnLabels, ft);
+                return new MetaData(table, name(table, true), columnLabels, ft);
             });
     }
 
-    private String fieldName(String columnLabel, boolean pascalCase) {
+    private String name(String columnLabel, boolean pascalCase) {
         String[] parts = columnLabel.toLowerCase().split(NAMES_SEPARATOR);
         StringBuilder name = new StringBuilder();
         String first = parts[0];

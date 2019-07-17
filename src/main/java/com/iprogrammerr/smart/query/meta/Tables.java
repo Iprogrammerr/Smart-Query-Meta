@@ -10,6 +10,7 @@ public class Tables {
 
     private static final String TYPE = "TABLE";
     private static final String TABLE_KEY = "TABLE_NAME";
+    private static final String ALL_PATTERN = "%";
     private final Connection connection;
 
     public Tables(Connection connection) {
@@ -19,7 +20,7 @@ public class Tables {
     public List<String> all() {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet rs = metaData.getTables(null, null, "%", new String[]{TYPE});
+            ResultSet rs = metaData.getTables(connection.getCatalog(), null, ALL_PATTERN, new String[]{TYPE});
             List<String> tables = new ArrayList<>();
             while (rs.next()) {
                 tables.add(rs.getString(TABLE_KEY));
