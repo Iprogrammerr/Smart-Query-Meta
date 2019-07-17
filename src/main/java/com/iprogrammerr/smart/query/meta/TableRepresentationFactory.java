@@ -243,12 +243,11 @@ public class TableRepresentationFactory {
             .append(DOUBLE_TAB)
             .append(list(meta.className)).append(" ").append(LIST_NAME).append(EQUAL).append(INITIALIZED_LIST)
             .append(NEW_LINE).append(DOUBLE_TAB)
-            .append("while (").append(RESULT_SET_ARG_NAME).append(DOT).append("next()").append(") ")
-            .append(START_CURLY_BRACKET)
-            .append(NEW_LINE).append(DOUBLE_TAB).append(TAB)
+            .append("do ").append(START_CURLY_BRACKET).append(NEW_LINE).append(DOUBLE_TAB).append(TAB)
             .append(LIST_NAME).append(".add(").append(factoryInvocation(false, RESULT_SET_ARG_NAME,
                 aliasedArgsNames(meta.fieldsTypes))).append(");")
             .append(NEW_LINE).append(DOUBLE_TAB).append(END_CURLY_BRACKET)
+            .append(" while (").append(RESULT_SET_ARG_NAME).append(DOT).append("next()").append(");")
             .append(NEW_LINE).append(DOUBLE_TAB).append("return ").append(LIST_NAME).append(SEMICOLON)
             .toString();
     }

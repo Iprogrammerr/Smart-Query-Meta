@@ -37,18 +37,5 @@ public class App {
             System.out.println();
         }
 
-//        queryFactory.newQuery().dsl()
-//            .insertInto(Author.TABLE)
-//            .columns(Author.NAME, Author.SURNAME, Author.ALIAS, Author.ALIVE)
-//            .values("Adam", "Mickiewicz", "Wieszcz", 0)
-//            .query()
-//            .execute();
-//
-//        List<Author> authors = queryFactory.newQuery().dsl()
-//            .selectAll().from(Author.TABLE)
-//            .query()
-//            .fetch(Author::fromListResult);
-
-        // System.out.println(authors);
     }
 }
