@@ -19,7 +19,6 @@ public class App {
 
         Connection connection = DriverManager.getConnection(configuration.jdbcUrl(), configuration.databaseUser(),
             configuration.databasePassword());
-        setupDb(connection);
 
         QueryFactory queryFactory = new SmartQueryFactory(() -> connection, false);
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage());
