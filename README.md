@@ -31,7 +31,7 @@ CREATE TABLE author (
 DROP TABLE IF EXISTS book;
 
 CREATE TABLE book (
-	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	author_id INT UNSIGNED NOT NULL,
 	title VARCHAR(100) NOT NULL UNIQUE,
 	year_of_publication INT UNSIGNED NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE book (
 );
 ```
 Output:
-```
+```java
 package com.iprogrammerr.smart.query.meta.table;
 
 import java.sql.ResultSet;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
 
 public class Author {
 
-	public static final String TABLE = "AUTHOR";
+    public static final String TABLE = "AUTHOR";
 	public static final String ID = "id";
 	public static final String NAME = "name";
 	public static final String SURNAME = "surname";
@@ -150,6 +150,31 @@ public class Book {
 		return fromListResult(result, ID, AUTHOR_ID, TITLE, YEAR_OF_PUBLICATION);
 	}
 }
+```
+Using [Smart Query:](https://github.com/Iprogrammerr/Smart-Query)
+```java
+long id = queryFactory.newQuery().dsl()
+    .insertInto(Author.TABLE)
+    .columns(Author.NAME, Author.SURNAME, Author.ALIAS, Author.ALIVE)
+    .values("Friedrich", "Nietzsche", "Dynamite", 0)
+    .query()
+    .executeReturningId();
+        
+Author author = queryFactory.newQuery().dsl()
+    .selectAll().from(Author.TABLE).where(Author.ID).equal().value(id)
+    .query()
+    .fetch(r -> {
+        r.next();
+        return Author.fromResult(r);
+    });
+        
+List<Book> books = queryFactory.newQuery().dsl()
+    .selectAll().from(Book.TABLE).where(Book.AUTHOR_ID).equal().value(id)
+    .query()
+    .fetch(r -> {
+        r.next();
+        return Book.fromListResult(r);
+    });
 ```
 ## Supported databases
 * MySQL
