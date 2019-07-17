@@ -17,7 +17,6 @@ public class App {
         setup.setup();
 
         QueryFactory queryFactory = new SmartQueryFactory(setup::connection, false);
-        //String classesPath = App.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage());
         List<String> tables = new Tables(setup.connection()).all();
 
@@ -36,6 +35,5 @@ public class App {
             System.out.println(representation);
             System.out.println();
         }
-
     }
 }

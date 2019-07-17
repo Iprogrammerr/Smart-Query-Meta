@@ -19,7 +19,7 @@ public class Tables {
     public List<String> all() {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet rs = metaData.getTables(null, null, null, new String[]{TYPE});
+            ResultSet rs = metaData.getTables(null, null, "%", new String[]{TYPE});
             List<String> tables = new ArrayList<>();
             while (rs.next()) {
                 tables.add(rs.getString(TABLE_KEY));

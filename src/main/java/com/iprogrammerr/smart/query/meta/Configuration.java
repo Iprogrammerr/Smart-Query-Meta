@@ -28,10 +28,6 @@ public class Configuration {
         }
     }
 
-    public static Configuration fromClassPath() {
-        return fromCmd();
-    }
-
     public String databaseUser() {
         return notNull(DATABASE_USER);
     }

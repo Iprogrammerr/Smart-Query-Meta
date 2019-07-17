@@ -21,6 +21,7 @@ public class MetaTable {
         TYPES_MAPPING.put("Short", "short");
         TYPES_MAPPING.put("Integer", "int");
         TYPES_MAPPING.put("Long", "long");
+        TYPES_MAPPING.put("BigInteger", "long");
         TYPES_MAPPING.put("Float", "float");
         TYPES_MAPPING.put("Double", "double");
     }

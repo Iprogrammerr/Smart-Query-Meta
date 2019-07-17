@@ -16,6 +16,7 @@ CREATE TABLE book (
 	author_id INT UNSIGNED NOT NULL,
 	title VARCHAR(100) NOT NULL UNIQUE,
 	year_of_publication INT UNSIGNED NOT NULL,
+	test BLOB,
 	PRIMARY KEY (id),
 	FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE CASCADE
 );

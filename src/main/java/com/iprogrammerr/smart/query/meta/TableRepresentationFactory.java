@@ -12,6 +12,8 @@ public class TableRepresentationFactory {
     private static final String PACKAGE_PREFIX = "package";
     private static final List<String> IMPORTS = Arrays.asList("import java.sql.ResultSet;", "import java.util.List;",
         "import java.util.ArrayList;");
+    private static final String BLOB_IMPORT = "import java.sql.Blob;";
+    private static final String BLOB = "Blob";
     private static final String CONSTANTS_MODIFIED = "public static final";
     private static final String CLASS_PREFIX = "public class";
     private static final String START_CURLY_BRACKET = "{";
@@ -48,7 +50,7 @@ public class TableRepresentationFactory {
 
     public String newRepresentation(MetaData data) {
         return new StringBuilder()
-            .append(header(data.className))
+            .append(header(data.className, data.fieldsTypes.values().contains(BLOB)))
             .append(fields(data))
             .append(constructor(data.className, data.fieldsTypes))
             .append(factories(data))
@@ -56,12 +58,15 @@ public class TableRepresentationFactory {
             .toString();
     }
 
-    private String header(String className) {
+    private String header(String className, boolean hasBlob) {
         StringBuilder builder = new StringBuilder()
             .append(PACKAGE_PREFIX).append(" ").append(packageName).append(SEMICOLON)
             .append(EMPTY_LINE);
         for (String i : IMPORTS) {
             builder.append(i).append(NEW_LINE);
+        }
+        if (hasBlob) {
+            builder.append(BLOB_IMPORT).append(NEW_LINE);
         }
         return builder.append(NEW_LINE)
             .append(CLASS_PREFIX).append(" ").append(className).append(" ").append(START_CURLY_BRACKET)
