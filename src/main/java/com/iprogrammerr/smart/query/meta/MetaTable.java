@@ -82,5 +82,4 @@ public class MetaTable {
         }
         return TYPES_MAPPING.getOrDefault(type, type);
     }
-
 }

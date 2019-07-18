@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class TableRepresentationFactory {
 
-    private static final int MAX_ARG_LINE_SIZE = 60;
+    private static final int MAX_ARG_LINE_SIZE = 100;
     private static final String PACKAGE_PREFIX = "package";
     private static final List<String> IMPORTS = Arrays.asList("import java.sql.ResultSet;", "import java.util.List;",
         "import java.util.ArrayList;");
@@ -101,7 +101,7 @@ public class TableRepresentationFactory {
         builder.append(TAB).append(PUBLIC_MODIFIER).append(" ").append(className).append(START_BRACKET);
         List<String> args = fieldsTypes.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
             .collect(Collectors.toList());
-        builder.append(methodArgs(args)).append(END_BRACKET).append(" ").append(START_CURLY_BRACKET);
+        builder.append(methodArgs(builder.length(), args)).append(END_BRACKET).append(" ").append(START_CURLY_BRACKET);
         for (String f : fieldsTypes.keySet()) {
             builder.append(NEW_LINE).append(DOUBLE_TAB)
                 .append(THIS).append(DOT).append(f).append(EQUAL).append(f).append(SEMICOLON);
@@ -109,15 +109,16 @@ public class TableRepresentationFactory {
         return builder.append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET).toString();
     }
 
-    private String methodArgs(List<String> args) {
+    private String methodArgs(int firstLineOffset, List<String> args) {
         StringBuilder builder = new StringBuilder();
         builder.append(args.get(0));
         int previousLineLength = 0;
         for (int i = 1; i < args.size(); i++) {
             builder.append(COMMA).append(" ");
-            if ((builder.length() - previousLineLength) > MAX_ARG_LINE_SIZE) {
+            if (((firstLineOffset + builder.length()) - previousLineLength) > MAX_ARG_LINE_SIZE) {
                 builder.append(NEW_LINE).append(DOUBLE_TAB);
                 previousLineLength = builder.length();
+                firstLineOffset = 0;
             }
             builder.append(args.get(i));
 
@@ -141,7 +142,7 @@ public class TableRepresentationFactory {
     private String singleAliasedFactory(MetaData data) {
         StringBuilder builder = new StringBuilder();
         builder.append(factoryPrefix(false, data.className))
-            .append(aliasedFactoryArgs(data.fieldsTypes))
+            .append(aliasedFactoryArgs(builder.length(), data.fieldsTypes))
             .append(END_BRACKET).append(" ").append(THROWS_EXCEPTION)
             .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE);
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
@@ -149,19 +150,20 @@ public class TableRepresentationFactory {
                 resultSetInvocation(e.getValue(), aliased(e.getKey()))))
                 .append(NEW_LINE);
         }
+        int offset = builder.length();
         return builder.append(DOUBLE_TAB).append("return new ").append(data.className).append(START_BRACKET)
-            .append(methodArgs(new ArrayList<>(data.fieldsTypes.keySet())))
+            .append(methodArgs(builder.length() - offset, new ArrayList<>(data.fieldsTypes.keySet())))
             .append(END_BRACKET).append(SEMICOLON)
             .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
             .toString();
     }
 
-    private String aliasedFactoryArgs(Map<String, String> fieldsTypes) {
+    private String aliasedFactoryArgs(int firstLineOffset, Map<String, String> fieldsTypes) {
         List<String> args = new ArrayList<>();
         args.add(resultSetArg());
         args.addAll(fieldsTypes.keySet().stream().map(f -> STRING + " " + aliased(f))
             .collect(Collectors.toList()));
-        return methodArgs(args);
+        return methodArgs(firstLineOffset, args);
     }
 
     private String resultSetArg() {
@@ -220,9 +222,9 @@ public class TableRepresentationFactory {
     }
 
     private String aliasedListFactory(MetaData data) {
-        return new StringBuilder()
-            .append(factoryPrefix(true, data.className))
-            .append(aliasedFactoryArgs(data.fieldsTypes))
+        StringBuilder builder = new StringBuilder()
+            .append(factoryPrefix(true, data.className));
+        return builder.append(aliasedFactoryArgs(builder.length(), data.fieldsTypes))
             .append(END_BRACKET).append(" ").append(THROWS_EXCEPTION)
             .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE)
             .append(listMapping(data))

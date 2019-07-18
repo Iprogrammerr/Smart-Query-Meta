@@ -125,9 +125,6 @@
             <properties>
                 <packaging.type>maven-plugin</packaging.type>
             </properties>
-            <dependencies>
-
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>

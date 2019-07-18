@@ -2,14 +2,9 @@ package com.iprogrammerr.smart.query.meta;
 
 import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.SmartQueryFactory;
-import org.h2.tools.RunScript;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.List;
 
 public class App {
@@ -19,14 +14,12 @@ public class App {
     }
 
     public void execute(Configuration configuration) throws Exception {
-        System.out.println("Configuration:");
-        System.out.println(configuration);
-        Connection connection = DriverManager.getConnection(configuration.jdbcUrl, configuration.databaseUser,
+        Database database = new Database(configuration.jdbcUrl, configuration.databaseUser,
             configuration.databasePassword);
 
-        QueryFactory queryFactory = new SmartQueryFactory(() -> connection, false);
+        QueryFactory queryFactory = new SmartQueryFactory(database::connection, false);
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage);
-        List<String> tables = new Tables(connection).all();
+        List<String> tables = new Tables(database.connection()).all();
 
         File classesFile = new File(configuration.classesPath);
         if (!(classesFile.exists() || classesFile.mkdirs())) {
@@ -34,20 +27,14 @@ public class App {
                 configuration.classesPath));
         }
 
-        System.out.println(String.format("Generating %s db tables representations:", connection.getCatalog()));
+        System.out.println(String.format("Generating %s db tables representations:",
+            database.connection().getCatalog()));
         for (String t : tables) {
             System.out.println(t);
             MetaData meta = new MetaTable(queryFactory, t).data();
             String representation = tablesFactory.newRepresentation(meta);
             Files.write(new File(classesFile, meta.className + ".java").toPath(),
                 representation.getBytes());
-        }
-    }
-
-    private void setupDb(Connection connection) throws Exception {
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(
-            getClass().getResourceAsStream("/schema.sql")))) {
-            RunScript.execute(connection, r);
         }
     }
 }
