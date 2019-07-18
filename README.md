@@ -84,7 +84,7 @@ public class Author {
         return fromResult(result, ID, NAME, SURNAME, ALIAS, ALIVE);
     }
     
-    public static List<Author> fromListResult(ResultSet result, String idLabel, String nameLabel, String surnameLabel, 
+    public static List<Author> listFromResult(ResultSet result, String idLabel, String nameLabel, String surnameLabel, 
         String aliasLabel, String aliveLabel) throws Exception {
         List<Author> list = new ArrayList<>();
         do {
@@ -93,7 +93,7 @@ public class Author {
         return list;
     }
     
-    public static List<Author> fromListResult(ResultSet result) throws Exception {
+    public static List<Author> listFromResult(ResultSet result) throws Exception {
         return fromListResult(result, ID, NAME, SURNAME, ALIAS, ALIVE);
     }
 }
@@ -120,8 +120,8 @@ public class Book {
     public Book(int id, int authorId, String title, int yearOfPublication) {
         this.id = id;
         this.authorId = authorId;
-	    this.title = title;
-	    this.yearOfPublication = yearOfPublication;     
+        this.title = title;
+        this.yearOfPublication = yearOfPublication;     
     }
 
     public static Book fromResult(ResultSet result, String idLabel, String authorIdLabel, String titleLabel, 
@@ -137,7 +137,7 @@ public class Book {
         return fromResult(result, ID, AUTHOR_ID, TITLE, YEAR_OF_PUBLICATION);
     }
 
-    public static List<Book> fromListResult(ResultSet result, String idLabel, String authorIdLabel, String titleLabel, 
+    public static List<Book> listFromResult(ResultSet result, String idLabel, String authorIdLabel, String titleLabel, 
 	   	String yearOfPublicationLabel) throws Exception {
         List<Book> list = new ArrayList<>();
         do {
@@ -146,7 +146,7 @@ public class Book {
         return list;
     }
 
-    public static List<Book> fromListResult(ResultSet result) throws Exception {
+    public static List<Book> listFromResult(ResultSet result) throws Exception {
         return fromListResult(result, ID, AUTHOR_ID, TITLE, YEAR_OF_PUBLICATION);
     }
 }

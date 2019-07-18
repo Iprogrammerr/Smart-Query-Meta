@@ -35,7 +35,7 @@ public class TableRepresentationFactory {
     private static final String STRING = "String";
     private static final String FACTORIES_MODIFIER = "public static";
     private static final String FACTORY_NAME = "fromResult";
-    private static final String LIST_FACTORY_NAME = "fromListResult";
+    private static final String LIST_FACTORY_NAME = "listFromResult";
     private static final String RESULT_SET = "ResultSet";
     private static final String RESULT_SET_ARG_NAME = "result";
     private static final String THROWS_EXCEPTION = "throws Exception";
