@@ -7,12 +7,14 @@
     <groupId>com.iprogrammerr</groupId>
     <artifactId>smart-query-meta</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>${packaging.type}</packaging>
 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <packaging.type>jar</packaging.type>
     </properties>
 
     <dependencies>
@@ -73,6 +75,16 @@
             <artifactId>smart-query</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>3.4</version>
+        </dependency>
     </dependencies>
 
 
@@ -106,4 +118,25 @@
             ${project.artifactId}
         </finalName>
     </build>
+
+    <profiles>
+        <profile>
+            <id>plugin</id>
+            <properties>
+                <packaging.type>maven-plugin</packaging.type>
+            </properties>
+            <dependencies>
+
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-plugin-plugin</artifactId>
+                        <version>3.6.0</version>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
