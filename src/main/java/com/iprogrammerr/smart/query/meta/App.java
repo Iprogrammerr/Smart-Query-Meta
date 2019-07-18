@@ -15,19 +15,23 @@ import java.util.List;
 public class App {
 
     public static void main(String... args) throws Exception {
-        Configuration configuration = Configuration.fromCmd(args);
+        new App().execute(Configuration.fromCmd(args));
+    }
 
-        Connection connection = DriverManager.getConnection(configuration.jdbcUrl(), configuration.databaseUser(),
-            configuration.databasePassword());
+    public void execute(Configuration configuration) throws Exception {
+        System.out.println("Configuration:");
+        System.out.println(configuration);
+        Connection connection = DriverManager.getConnection(configuration.jdbcUrl, configuration.databaseUser,
+            configuration.databasePassword);
 
         QueryFactory queryFactory = new SmartQueryFactory(() -> connection, false);
-        TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage());
+        TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage);
         List<String> tables = new Tables(connection).all();
 
-        File classesFile = new File(configuration.classesPath());
+        File classesFile = new File(configuration.classesPath);
         if (!(classesFile.exists() || classesFile.mkdirs())) {
             throw new RuntimeException(String.format("Can't create necessary %s directory",
-                configuration.classesPath()));
+                configuration.classesPath));
         }
 
         System.out.println(String.format("Generating %s db tables representations:", connection.getCatalog()));
@@ -40,9 +44,9 @@ public class App {
         }
     }
 
-    private static void setupDb(Connection connection) throws Exception {
+    private void setupDb(Connection connection) throws Exception {
         try (BufferedReader r = new BufferedReader(new InputStreamReader(
-            App.class.getResourceAsStream("/schema.sql")))) {
+            getClass().getResourceAsStream("/schema.sql")))) {
             RunScript.execute(connection, r);
         }
     }

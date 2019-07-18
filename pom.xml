@@ -6,7 +6,7 @@
 
     <groupId>com.iprogrammerr</groupId>
     <artifactId>smart-query-meta</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>${packaging.type}</packaging>
 
 
@@ -87,7 +87,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
@@ -119,9 +118,10 @@
         </finalName>
     </build>
 
+
     <profiles>
         <profile>
-            <id>plugin</id>
+            <id>release</id>
             <properties>
                 <packaging.type>maven-plugin</packaging.type>
             </properties>

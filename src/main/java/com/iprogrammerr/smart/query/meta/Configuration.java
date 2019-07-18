@@ -6,15 +6,37 @@ import java.util.Properties;
 
 public class Configuration {
 
-    public static final String DATABASE_USER = "database.user";
-    public static final String DATABASE_PASSWORD = "database.password";
-    public static final String JDBC_URL = "jdbc.url";
-    public static final String CLASSES_PACKAGE = "classes.package";
-    public static final String CLASSES_PATH = "classes.path";
-    private final Properties properties;
+    private static final String DATABASE_USER = "database.user";
+    private static final String DATABASE_PASSWORD = "database.password";
+    private static final String JDBC_URL = "jdbc.url";
+    private static final String CLASSES_PACKAGE = "classes.package";
+    private static final String CLASSES_PATH = "classes.path";
+    public final String jdbcUrl;
+    public final String databaseUser;
+    public final String databasePassword;
+    public final String classesPackage;
+    public final String classesPath;
 
-    public Configuration(Properties properties) {
-        this.properties = properties;
+    public Configuration(String jdbcUrl, String databaseUser, String databasePassword, String classesPackage,
+        String classesPath) {
+        this.jdbcUrl = notNull(JDBC_URL, jdbcUrl);
+        this.databaseUser = notNull(DATABASE_USER, databaseUser);
+        this.databasePassword = notNull(DATABASE_PASSWORD, databasePassword);
+        this.classesPackage = notNull(CLASSES_PACKAGE, classesPackage);
+        this.classesPath = notNull(CLASSES_PATH, classesPath);
+    }
+
+    private static String notNull(String key, String value) {
+        if (value == null) {
+            throw new RuntimeException(String.format("%s property is required", key));
+        }
+        return value;
+    }
+
+    public static Configuration fromProperties(Properties properties) {
+        return new Configuration(properties.getProperty(JDBC_URL), properties.getProperty(DATABASE_USER),
+            properties.getProperty(DATABASE_PASSWORD), properties.getProperty(CLASSES_PACKAGE),
+            properties.getProperty(CLASSES_PATH));
     }
 
     public static Configuration fromCmd(String... args) {
@@ -22,37 +44,20 @@ public class Configuration {
             : new FileInputStream(args[0])) {
             Properties properties = new Properties();
             properties.load(is);
-            return new Configuration(properties);
+            return fromProperties(properties);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String databaseUser() {
-        return notNull(DATABASE_USER);
-    }
-
-    public String databasePassword() {
-        return notNull(DATABASE_PASSWORD);
-    }
-
-    public String jdbcUrl() {
-        return notNull(JDBC_URL);
-    }
-
-    public String classesPackage() {
-        return notNull(CLASSES_PACKAGE);
-    }
-
-    public String classesPath() {
-        return notNull(CLASSES_PATH);
-    }
-
-    private String notNull(String key) {
-        String value = properties.getProperty(key);
-        if (value == null) {
-            throw new RuntimeException(String.format("There is no property associated with %s value", key));
-        }
-        return value;
+    @Override
+    public String toString() {
+        return "Configuration{" +
+            "jdbcUrl='" + jdbcUrl + '\'' +
+            ", databaseUser='" + databaseUser + '\'' +
+            ", databasePassword='" + databasePassword + '\'' +
+            ", classesPackage='" + classesPackage + '\'' +
+            ", classesPath='" + classesPath + '\'' +
+            '}';
     }
 }
