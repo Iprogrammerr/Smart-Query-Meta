@@ -173,7 +173,7 @@ List<Book> books = queryFactory.newQuery().dsl()
     .query()
     .fetch(r -> {
         r.next();
-        return Book.fromListResult(r);
+        return Book.listFromResult(r);
     });
 ```
 ## Supported databases
