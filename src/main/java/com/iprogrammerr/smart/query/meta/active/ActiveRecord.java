@@ -1,4 +1,4 @@
-package com.iprogrammerr.smart.query.meta;
+package com.iprogrammerr.smart.query.meta.active;
 
 import com.iprogrammerr.smart.query.Query;
 import com.iprogrammerr.smart.query.QueryDsl;

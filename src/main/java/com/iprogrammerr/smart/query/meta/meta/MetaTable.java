@@ -1,4 +1,4 @@
-package com.iprogrammerr.smart.query.meta;
+package com.iprogrammerr.smart.query.meta.meta;
 
 import com.iprogrammerr.smart.query.QueryFactory;
 

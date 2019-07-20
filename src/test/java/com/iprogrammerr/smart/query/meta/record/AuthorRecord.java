@@ -1,10 +1,10 @@
 package com.iprogrammerr.smart.query.meta.record;
 
 import com.iprogrammerr.smart.query.QueryFactory;
-import com.iprogrammerr.smart.query.meta.ActiveRecord;
-import com.iprogrammerr.smart.query.meta.UpdateableColumn;
+import com.iprogrammerr.smart.query.meta.active.ActiveRecord;
+import com.iprogrammerr.smart.query.meta.active.UpdateableColumn;
 
-public class AuthorRecord extends ActiveRecord<Author> {
+public class AuthorRecord extends ActiveRecord< Author> {
 
     public AuthorRecord(QueryFactory factory, Integer id) {
         super(factory, Author.TABLE, new UpdateableColumn<>(Author.ID, id), new UpdateableColumn<>(Author.NAME),

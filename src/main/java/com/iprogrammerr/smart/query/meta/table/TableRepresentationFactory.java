@@ -1,4 +1,6 @@
-package com.iprogrammerr.smart.query.meta;
+package com.iprogrammerr.smart.query.meta.table;
+
+import com.iprogrammerr.smart.query.meta.meta.MetaData;
 
 import java.util.ArrayList;
 import java.util.Arrays;

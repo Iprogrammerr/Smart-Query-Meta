@@ -1,4 +1,4 @@
-package com.iprogrammerr.smart.query.meta;
+package com.iprogrammerr.smart.query.meta.meta;
 
 import java.util.List;
 import java.util.Map;
@@ -16,5 +16,15 @@ public class MetaData {
         this.className = className;
         this.columnsLabels = columnsLabels;
         this.fieldsTypes = fieldsTypes;
+    }
+
+    @Override
+    public String toString() {
+        return "MetaData{" +
+            "tableName='" + tableName + '\'' +
+            ", className='" + className + '\'' +
+            ", columnsLabels=" + columnsLabels +
+            ", fieldsTypes=" + fieldsTypes +
+            '}';
     }
 }
