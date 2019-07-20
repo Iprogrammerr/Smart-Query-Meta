@@ -53,9 +53,20 @@ public abstract class ActiveRecord<T> {
 
     private long insert(boolean returnId) {
         List<UpdateableColumn> changed = changed();
-        if (changed.isEmpty()) {
-            return -1;
+        long id = -1;
+        if (!changed.isEmpty()) {
+            Query query = insertQuery(changed);
+            if (returnId) {
+                id = query.executeReturningId();
+                setId(id);
+            } else {
+                query.execute();
+            }
         }
+        return id;
+    }
+
+    private Query insertQuery(List<UpdateableColumn> changed) {
         QueryDsl dsl = factory.newQuery().dsl().insertInto(table);
         String[] columns = new String[changed.size() - 1];
         Object[] values = new Object[changed.size() - 1];
@@ -65,16 +76,7 @@ public abstract class ActiveRecord<T> {
             values[i - 1] = value.value();
         }
         UpdateableColumn first = changed.get(0);
-        Query query = dsl.columns(first.name(), columns).values(first.value(), values).query();
-        long id;
-        if (returnId) {
-            id = query.executeReturningId();
-            setId(id);
-        } else {
-            query.execute();
-            id = -1;
-        }
-        return id;
+        return dsl.columns(first.name(), columns).values(first.value(), values).query();
     }
 
     private void setId(long id) {

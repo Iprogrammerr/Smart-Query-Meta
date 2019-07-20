@@ -16,11 +16,11 @@ public class App {
     public void execute(Configuration configuration) throws Exception {
         Database database = new Database(configuration.jdbcUrl, configuration.databaseUser,
             configuration.databasePassword);
-        database.setup();
+        //database.setup();
 
         QueryFactory queryFactory = new SmartQueryFactory(database::connection, false);
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage);
-        List<String> tables = new Tables(database.connection()).all();
+        List<Table> tables = new Tables(database.connection()).all();
 
         File classesFile = new File(configuration.classesPath);
         if (!(classesFile.exists() || classesFile.mkdirs())) {
@@ -30,9 +30,10 @@ public class App {
 
         System.out.println(String.format("Generating %s db tables representations:",
             database.connection().getCatalog()));
-        for (String t : tables) {
-            System.out.println(t);
-            MetaData meta = new MetaTable(queryFactory, t).data();
+        for (Table t : tables) {
+            System.out.println(t.name);
+            System.out.println(t.idName);
+            MetaData meta = new MetaTable(queryFactory, t.name).data();
             String representation = tablesFactory.newRepresentation(meta);
             Files.write(new File(classesFile, meta.className + ".java").toPath(),
                 representation.getBytes());

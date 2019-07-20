@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,7 +29,8 @@ public class TableRepresentationFactoryTest {
 
     @Test
     public void generatesTables() throws Exception {
-        List<String> tables = new Tables(database.connection()).all();
+        List<String> tables = new Tables(database.connection()).all().stream()
+            .map(t -> t.name).collect(Collectors.toList());
 
         String expectedTable = tableFormula("Author");
         assertEquals(expectedTable, factory.newRepresentation(new MetaTable(queryFactory, tables.get(0)).data()));

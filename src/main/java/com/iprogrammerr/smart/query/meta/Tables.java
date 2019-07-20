@@ -10,6 +10,7 @@ public class Tables {
 
     private static final String TYPE = "TABLE";
     private static final String TABLE_KEY = "TABLE_NAME";
+    private static final String ID_KEY = "COLUMN_NAME";
     private static final String ALL_PATTERN = "%";
     private final Connection connection;
 
@@ -17,13 +18,16 @@ public class Tables {
         this.connection = connection;
     }
 
-    public List<String> all() {
+    public List<Table> all() {
         try {
             DatabaseMetaData metaData = connection.getMetaData();
             ResultSet rs = metaData.getTables(connection.getCatalog(), null, ALL_PATTERN, new String[]{TYPE});
-            List<String> tables = new ArrayList<>();
+            List<Table> tables = new ArrayList<>();
             while (rs.next()) {
-                tables.add(rs.getString(TABLE_KEY));
+                String table = rs.getString(TABLE_KEY);
+                ResultSet idRs = metaData.getPrimaryKeys(null, null, table);
+                idRs.next();
+                tables.add(new Table(table, idRs.getString(ID_KEY)));
             }
             return tables;
         } catch (Exception e) {
