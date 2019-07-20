@@ -3,10 +3,10 @@ package com.iprogrammerr.smart.query.meta;
 public class Table {
 
     public final String name;
-    public final String idName;
+    public final IdInfo idInfo;
 
-    public Table(String name, String idName) {
+    public Table(String name, IdInfo idInfo) {
         this.name = name;
-        this.idName = idName;
+        this.idInfo = idInfo;
     }
 }

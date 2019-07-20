@@ -1,5 +1,6 @@
 package com.iprogrammerr.smart.query.meta.factory;
 
+import com.iprogrammerr.smart.query.meta.IdInfo;
 import com.iprogrammerr.smart.query.meta.meta.MetaData;
 
 import java.util.Arrays;
@@ -35,14 +36,14 @@ public class ActiveRecordImplFactory {
         this.packageName = packageName;
     }
 
-    public String newImplementation(MetaData meta, String idName) {
-        String idType = idType(meta, idName);
+    public String newImplementation(MetaData meta, IdInfo idInfo) {
+        String idType = idType(meta, idInfo.name);
         return new StringBuilder()
             .append(prolog())
             .append(Strings.NEW_LINE)
             .append(header(meta, idType))
             .append(Strings.EMPTY_LINE)
-            .append(constructors(meta, idName, idType))
+            .append(constructors(meta, idInfo, idType))
             .append(Strings.EMPTY_LINE).append(Strings.TAB)
             .append(OVERRIDE)
             .append(Strings.NEW_LINE).append(Strings.TAB)
@@ -87,12 +88,12 @@ public class ActiveRecordImplFactory {
         return meta.className + "." + key;
     }
 
-    private String constructors(MetaData meta, String idName, String idType) {
+    private String constructors(MetaData meta, IdInfo idInfo, String idType) {
         return new StringBuilder()
             .append(constructorPrefix(meta.className)).append(", ").append(idType)
             .append(" ").append(ID).append(Strings.END_BRACKET).append(" ").append(Strings.START_CURLY_BRACKET)
             .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-            .append(superCall(meta, idName, idType))
+            .append(superCall(meta, idInfo, idType))
             .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
             .append(Strings.EMPTY_LINE)
             .append(constructorPrefix(meta.className)).append(Strings.END_BRACKET)
@@ -111,15 +112,15 @@ public class ActiveRecordImplFactory {
     }
 
     //TODO is auto increment, id type?
-    private String superCall(MetaData meta, String idName, String idType) {
+    private String superCall(MetaData meta, IdInfo idInfo, String idType) {
         StringBuilder builder = new StringBuilder()
             .append("super").append(Strings.START_BRACKET).append(QUERY_FACTORY_ARG).append(", ")
             .append(constant(meta, Strings.TABLE)).append(", ")
-            .append(newUpdateableColumn(constant(meta, idName) + ", " + ID))
-            .append(", ").append(idType).append(".class").append(", ").append("true");
+            .append(newUpdateableColumn(constant(meta, idInfo.name) + ", " + ID))
+            .append(", ").append(idType).append(".class").append(", ").append(idInfo.autoIncrement);
         int previousLength = 0;
         for (String c : meta.columnsLabels) {
-            if (c.equals(idName)) {
+            if (c.equals(idInfo.name)) {
                 continue;
             }
             builder.append(", ");

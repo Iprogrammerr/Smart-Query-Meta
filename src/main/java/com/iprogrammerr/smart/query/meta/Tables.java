@@ -1,6 +1,6 @@
 package com.iprogrammerr.smart.query.meta;
 
-import com.iprogrammerr.smart.query.meta.Table;
+import com.iprogrammerr.smart.query.SmartQuery;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -26,14 +26,27 @@ public class Tables {
             ResultSet rs = metaData.getTables(connection.getCatalog(), null, ALL_PATTERN, new String[]{TYPE});
             List<Table> tables = new ArrayList<>();
             while (rs.next()) {
-                String table = rs.getString(TABLE_KEY);
-                ResultSet idRs = metaData.getPrimaryKeys(null, null, table);
-                idRs.next();
-                tables.add(new Table(table, idRs.getString(ID_KEY)));
+                tables.add(tableFromResult(metaData, rs));
             }
             return tables;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Table tableFromResult(DatabaseMetaData metaData, ResultSet result) throws Exception {
+        String table = result.getString(TABLE_KEY);
+        ResultSet idRs = metaData.getPrimaryKeys(null, null, table);
+        idRs.next();
+        String idColumn = idRs.getString(ID_KEY);
+        boolean autoIncrement = hasAutoIncrementId(table, idColumn);
+        return new Table(table, new IdInfo(idColumn, autoIncrement));
+    }
+
+    private boolean hasAutoIncrementId(String table, String idColumn) {
+        return new SmartQuery(connection, false).dsl()
+            .select(idColumn).from(table)
+            .query()
+            .fetch(r -> r.getMetaData().isAutoIncrement(1));
     }
 }
