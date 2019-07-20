@@ -1,4 +1,4 @@
-package com.iprogrammerr.smart.query.meta.active;
+package com.iprogrammerr.smart.query.meta.factory;
 
 import com.iprogrammerr.smart.query.meta.meta.MetaData;
 
@@ -11,22 +11,15 @@ import java.util.Optional;
 public class ActiveRecordImplFactory {
 
     private static final int MAX_LINE_LENGTH = 80;
-    private static final String SEMICOLON = ";";
     private static final List<String> IMPORTS = Arrays.asList("import com.iprogrammerr.smart.query.QueryFactory;",
         "import com.iprogrammerr.smart.query.meta.active.ActiveRecord;",
         "import com.iprogrammerr.smart.query.meta.active.UpdateableColumn;");
-    private static final String START_CURLY_BRACKET = "{";
-    private static final String END_CURLY_BRACKET = "}";
-    private static final String TAB = "\t";
-    private static final String DOUBLE_TAB = TAB + TAB;
-    private static final String NEW_LINE = "\n";
-    private static final String EMPTY_LINE = NEW_LINE + NEW_LINE;
-    private static final String START_BRACKET = "(";
-    private static final String END_BRACKET = ")";
+    private static final String OVERRIDE = "@Override";
     private static final String QUERY_FACTORY = "QueryFactory";
     private static final String QUERY_FACTORY_ARG = "factory";
     private static final String PUBLIC = "public";
     private static final String ID = "id";
+    private static final String PARENT_FETCH = "fetchQuery()";
     private static final Map<String, String> ID_TYPE_TRANSLATION = new HashMap<>();
 
     static {
@@ -45,20 +38,24 @@ public class ActiveRecordImplFactory {
     public String newImplementation(MetaData meta, String idName) {
         return new StringBuilder()
             .append(prolog())
-            .append(NEW_LINE)
+            .append(Strings.NEW_LINE)
             .append(header(meta))
-            .append(EMPTY_LINE)
+            .append(Strings.EMPTY_LINE)
             .append(constructors(meta, idName))
-            .append(NEW_LINE)
-            .append(END_CURLY_BRACKET)
+            .append(Strings.EMPTY_LINE).append(Strings.TAB)
+            .append(OVERRIDE)
+            .append(Strings.NEW_LINE).append(Strings.TAB)
+            .append(fetchImplementation(meta))
+            .append(Strings.NEW_LINE)
+            .append(Strings.END_CURLY_BRACKET)
             .toString();
     }
 
     private String prolog() {
-        StringBuilder builder = new StringBuilder(packageName).append(SEMICOLON)
-            .append(EMPTY_LINE);
+        StringBuilder builder = new StringBuilder(packageName).append(Strings.SEMICOLON)
+            .append(Strings.EMPTY_LINE);
         for (String i : IMPORTS) {
-            builder.append(i).append(NEW_LINE);
+            builder.append(i).append(Strings.NEW_LINE);
         }
         return builder.toString();
     }
@@ -66,7 +63,7 @@ public class ActiveRecordImplFactory {
     private String header(MetaData meta) {
         return new StringBuilder()
             .append("public class ").append(implName(meta.className)).append(" extends ActiveRecord<")
-            .append(meta.className).append("> ").append(START_CURLY_BRACKET)
+            .append(meta.className).append("> ").append(Strings.START_CURLY_BRACKET)
             .toString();
     }
 
@@ -87,28 +84,29 @@ public class ActiveRecordImplFactory {
         }
         return new StringBuilder()
             .append(constructorPrefix(meta.className)).append(", ").append(ID_TYPE_TRANSLATION.get(idType.get()))
-            .append(" ").append(ID).append(END_BRACKET).append(" ").append(START_CURLY_BRACKET)
-            .append(NEW_LINE).append(DOUBLE_TAB)
+            .append(" ").append(ID).append(Strings.END_BRACKET).append(" ").append(Strings.START_CURLY_BRACKET)
+            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
             .append(superCall(meta, idName))
-            .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
-            .append(EMPTY_LINE)
-            .append(constructorPrefix(meta.className)).append(END_BRACKET)
-            .append(" ").append(START_CURLY_BRACKET).append(NEW_LINE).append(DOUBLE_TAB)
-            .append("this(").append(QUERY_FACTORY_ARG).append(", null").append(END_BRACKET).append(SEMICOLON)
-            .append(NEW_LINE).append(TAB).append(END_CURLY_BRACKET)
+            .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
+            .append(Strings.EMPTY_LINE)
+            .append(constructorPrefix(meta.className)).append(Strings.END_BRACKET)
+            .append(" ").append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
+            .append("this(").append(QUERY_FACTORY_ARG).append(", null").append(Strings.END_BRACKET)
+            .append(Strings.SEMICOLON)
+            .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
             .toString();
     }
 
     private String constructorPrefix(String className) {
         return new StringBuilder()
-            .append(TAB).append(PUBLIC).append(" ").append(implName(className)).append(START_BRACKET)
+            .append(Strings.TAB).append(PUBLIC).append(" ").append(implName(className)).append(Strings.START_BRACKET)
             .append(QUERY_FACTORY).append(" ").append(QUERY_FACTORY_ARG)
             .toString();
     }
 
     private String superCall(MetaData meta, String idName) {
         StringBuilder builder = new StringBuilder()
-            .append("super").append(START_BRACKET).append(QUERY_FACTORY_ARG)
+            .append("super").append(Strings.START_BRACKET).append(QUERY_FACTORY_ARG)
             .append(", ").append(newUpdateableColumn(constant(meta, idName) + ", " + ID));
         int previousLength = 0;
         for (String c : meta.columnsLabels) {
@@ -118,14 +116,30 @@ public class ActiveRecordImplFactory {
             builder.append(", ");
             if (builder.length() - previousLength > MAX_LINE_LENGTH) {
                 previousLength = builder.length();
-                builder.append(NEW_LINE).append(TAB).append(DOUBLE_TAB);
+                builder.append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.DOUBLE_TAB);
             }
             builder.append(newUpdateableColumn(constant(meta, c)));
         }
-        return builder.append(END_BRACKET).append(SEMICOLON).toString();
+        return builder.append(Strings.END_BRACKET).append(Strings.SEMICOLON).toString();
     }
 
     private String newUpdateableColumn(String inner) {
         return new StringBuilder("new UpdateableColumn<>(").append(inner).append(")").toString();
+    }
+
+    private String fetchImplementation(MetaData meta) {
+        return new StringBuilder()
+            .append(PUBLIC).append(" ").append(meta.className).append(" fetch() ").append(Strings.START_CURLY_BRACKET)
+            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append("return ").append(PARENT_FETCH)
+            .append(".fetch(r -> ")
+            .append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append(Strings.TAB)
+            .append("r.next();")
+            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append(Strings.TAB).append("return ")
+            .append(meta.className).append(Strings.DOT).append(Strings.FACTORY_NAME).append("(r);")
+            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append(Strings.END_CURLY_BRACKET)
+            .append(Strings.END_BRACKET)
+            .append(Strings.SEMICOLON)
+            .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
+            .toString();
     }
 }
