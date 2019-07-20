@@ -17,8 +17,8 @@ public class MetaTable {
 
     static {
         TYPES_MAPPING.put("Boolean", "boolean");
-        TYPES_MAPPING.put("Byte", "byte");
-        TYPES_MAPPING.put("Short", "short");
+        TYPES_MAPPING.put("Byte", "int");
+        TYPES_MAPPING.put("Short", "int");
         TYPES_MAPPING.put("Integer", "int");
         TYPES_MAPPING.put("Long", "long");
         TYPES_MAPPING.put("BigInteger", "long");

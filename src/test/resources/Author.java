@@ -17,9 +17,9 @@ public class Author {
 	public final String name;
 	public final String surname;
 	public final String alias;
-	public final byte alive;
+	public final int alive;
 
-	public Author(int id, String name, String surname, String alias, byte alive) {
+	public Author(int id, String name, String surname, String alias, int alive) {
 		this.id = id;
 		this.name = name;
 		this.surname = surname;
@@ -33,7 +33,7 @@ public class Author {
 		String name = result.getString(nameLabel);
 		String surname = result.getString(surnameLabel);
 		String alias = result.getString(aliasLabel);
-		byte alive = result.getByte(aliveLabel);
+		int alive = result.getInt(aliveLabel);
 		return new Author(id, name, surname, alias, alive);
 	}
 
