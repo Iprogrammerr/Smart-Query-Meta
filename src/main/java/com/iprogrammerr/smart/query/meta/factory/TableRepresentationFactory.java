@@ -18,7 +18,6 @@ public class TableRepresentationFactory {
     private static final String CONSTANTS_MODIFIED = "public static final";
     private static final String CLASS_PREFIX = "public class";
     private static final String FIELD_MODIFIER = "public final";
-    private static final String TABLE = "TABLE";
     private static final String STRING = "String";
     private static final String SPACED_EQUAL = " = ";
     private static final String FACTORIES_MODIFIER = "public static";
@@ -62,7 +61,7 @@ public class TableRepresentationFactory {
 
     private String fields(MetaData data) {
         StringBuilder builder = new StringBuilder();
-        builder.append(constant(TABLE, data.tableName));
+        builder.append(constant(Strings.TABLE, data.tableName));
         for (String l : data.columnsLabels) {
             builder.append(constant(l.toUpperCase(), l.toLowerCase()));
         }

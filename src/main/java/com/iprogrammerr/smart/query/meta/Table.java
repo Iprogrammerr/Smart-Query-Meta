@@ -1,4 +1,4 @@
-package com.iprogrammerr.smart.query.meta.table;
+package com.iprogrammerr.smart.query.meta;
 
 public class Table {
 

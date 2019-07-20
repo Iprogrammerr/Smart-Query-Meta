@@ -1,4 +1,6 @@
-package com.iprogrammerr.smart.query.meta.table;
+package com.iprogrammerr.smart.query.meta;
+
+import com.iprogrammerr.smart.query.meta.Table;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

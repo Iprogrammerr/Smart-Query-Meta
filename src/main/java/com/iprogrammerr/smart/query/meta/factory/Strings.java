@@ -2,6 +2,7 @@ package com.iprogrammerr.smart.query.meta.factory;
 
 public class Strings {
 
+    public static final String TABLE = "TABLE";
     public static final String PACKAGE_PREFIX = "package";
     public static final String START_CURLY_BRACKET = "{";
     public static final String END_CURLY_BRACKET = "}";
@@ -17,4 +18,13 @@ public class Strings {
     public static final String DOT = ".";
     public static final String THIS = "this";
     public static final String FACTORY_NAME = "fromResult";
+
+    public static String capitalized(String string) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(Character.toUpperCase(string.charAt(0)));
+        if (string.length() > 1) {
+            builder.append(string.substring(1));
+        }
+        return builder.toString();
+    }
 }

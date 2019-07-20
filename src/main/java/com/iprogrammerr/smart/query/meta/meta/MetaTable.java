@@ -1,6 +1,7 @@
 package com.iprogrammerr.smart.query.meta.meta;
 
 import com.iprogrammerr.smart.query.QueryFactory;
+import com.iprogrammerr.smart.query.meta.factory.Strings;
 
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
@@ -63,11 +64,7 @@ public class MetaTable {
             name.append(first);
         }
         for (int i = 1; i < parts.length; i++) {
-            String p = parts[i];
-            name.append(Character.toUpperCase(p.charAt(0)));
-            if (p.length() > 1) {
-                name.append(p.substring(1));
-            }
+            name.append(Strings.capitalized(parts[i]));
         }
         return name.toString();
     }

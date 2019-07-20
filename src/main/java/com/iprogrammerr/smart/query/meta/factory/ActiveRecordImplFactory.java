@@ -46,14 +46,16 @@ public class ActiveRecordImplFactory {
             .append(OVERRIDE)
             .append(Strings.NEW_LINE).append(Strings.TAB)
             .append(fetchImplementation(meta))
+            .append(setters(meta))
             .append(Strings.NEW_LINE)
             .append(Strings.END_CURLY_BRACKET)
             .toString();
     }
 
     private String prolog() {
-        StringBuilder builder = new StringBuilder(packageName).append(Strings.SEMICOLON)
-            .append(Strings.EMPTY_LINE);
+        StringBuilder builder = new StringBuilder()
+            .append(Strings.PACKAGE_PREFIX).append(" ").append(packageName)
+            .append(Strings.SEMICOLON).append(Strings.EMPTY_LINE);
         for (String i : IMPORTS) {
             builder.append(i).append(Strings.NEW_LINE);
         }
@@ -67,7 +69,7 @@ public class ActiveRecordImplFactory {
             .toString();
     }
 
-    private String implName(String className) {
+    public String implName(String className) {
         return className + "Record";
     }
 
@@ -75,7 +77,6 @@ public class ActiveRecordImplFactory {
         return meta.className + "." + key;
     }
 
-    //TODO unhardcode id type
     private String constructors(MetaData meta, String idName) {
         Optional<String> idType = meta.fieldsTypes.entrySet().stream()
             .filter(e -> e.getKey().equalsIgnoreCase(idName)).map(Map.Entry::getValue).findFirst();
@@ -106,8 +107,9 @@ public class ActiveRecordImplFactory {
 
     private String superCall(MetaData meta, String idName) {
         StringBuilder builder = new StringBuilder()
-            .append("super").append(Strings.START_BRACKET).append(QUERY_FACTORY_ARG)
-            .append(", ").append(newUpdateableColumn(constant(meta, idName) + ", " + ID));
+            .append("super").append(Strings.START_BRACKET).append(QUERY_FACTORY_ARG).append(", ")
+            .append(constant(meta, Strings.TABLE)).append(", ")
+            .append(newUpdateableColumn(constant(meta, idName) + ", " + ID));
         int previousLength = 0;
         for (String c : meta.columnsLabels) {
             if (c.equals(idName)) {
@@ -141,5 +143,28 @@ public class ActiveRecordImplFactory {
             .append(Strings.SEMICOLON)
             .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
             .toString();
+    }
+
+    private String setters(MetaData data) {
+        StringBuilder builder = new StringBuilder();
+        String className = implName(data.className);
+        int i = 0;
+        for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
+            builder.append(Strings.EMPTY_LINE).append(Strings.TAB)
+                .append(Strings.PUBLIC_MODIFIER).append(" ").append(className)
+                .append(" set").append(Strings.capitalized(e.getKey()))
+                .append(Strings.START_BRACKET)
+                .append(e.getValue()).append(" ").append(e.getKey())
+                .append(Strings.END_BRACKET)
+                .append(" ").append(Strings.START_CURLY_BRACKET)
+                .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
+                .append("set(").append(constant(data, data.columnsLabels.get(i++)))
+                .append(Strings.COMMA).append(" ").append(e.getKey()).append(Strings.END_BRACKET)
+                .append(Strings.SEMICOLON)
+                .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append("return this;")
+                .append(Strings.NEW_LINE).append(Strings.TAB)
+                .append(Strings.END_CURLY_BRACKET);
+        }
+        return builder.toString();
     }
 }

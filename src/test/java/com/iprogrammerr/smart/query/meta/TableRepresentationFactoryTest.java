@@ -4,7 +4,6 @@ import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.SmartQueryFactory;
 import com.iprogrammerr.smart.query.meta.meta.MetaTable;
 import com.iprogrammerr.smart.query.meta.factory.TableRepresentationFactory;
-import com.iprogrammerr.smart.query.meta.table.Tables;
 import org.junit.Before;
 import org.junit.Test;
 
