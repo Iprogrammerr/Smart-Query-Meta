@@ -12,8 +12,8 @@ public class ActiveRecordImplFactory {
 
     private static final int MAX_LINE_LENGTH = 80;
     private static final List<String> IMPORTS = Arrays.asList("import com.iprogrammerr.smart.query.QueryFactory;",
-        "import com.iprogrammerr.smart.query.meta.active.ActiveRecord;",
-        "import com.iprogrammerr.smart.query.meta.active.UpdateableColumn;");
+        "import com.iprogrammerr.smart.query.active.ActiveRecord;",
+        "import com.iprogrammerr.smart.query.active.UpdateableColumn;");
     private static final String OVERRIDE = "@Override";
     private static final String QUERY_FACTORY = "QueryFactory";
     private static final String QUERY_FACTORY_ARG = "factory";
@@ -36,12 +36,13 @@ public class ActiveRecordImplFactory {
     }
 
     public String newImplementation(MetaData meta, String idName) {
+        String idType = idType(meta, idName);
         return new StringBuilder()
             .append(prolog())
             .append(Strings.NEW_LINE)
-            .append(header(meta))
+            .append(header(meta, idType))
             .append(Strings.EMPTY_LINE)
-            .append(constructors(meta, idName))
+            .append(constructors(meta, idName, idType))
             .append(Strings.EMPTY_LINE).append(Strings.TAB)
             .append(OVERRIDE)
             .append(Strings.NEW_LINE).append(Strings.TAB)
@@ -50,6 +51,15 @@ public class ActiveRecordImplFactory {
             .append(Strings.NEW_LINE)
             .append(Strings.END_CURLY_BRACKET)
             .toString();
+    }
+
+    private String idType(MetaData meta, String idName) {
+        Optional<String> idType = meta.fieldsTypes.entrySet().stream()
+            .filter(e -> e.getKey().equalsIgnoreCase(idName)).map(Map.Entry::getValue).findFirst();
+        if (!idType.isPresent()) {
+            throw new RuntimeException(String.format("Can't find id %s in %s", idName, meta.fieldsTypes));
+        }
+        return ID_TYPE_TRANSLATION.get(idType.get());
     }
 
     private String prolog() {
@@ -62,10 +72,10 @@ public class ActiveRecordImplFactory {
         return builder.toString();
     }
 
-    private String header(MetaData meta) {
+    private String header(MetaData meta, String idType) {
         return new StringBuilder()
             .append("public class ").append(implName(meta.className)).append(" extends ActiveRecord<")
-            .append(meta.className).append("> ").append(Strings.START_CURLY_BRACKET)
+            .append(idType).append(", ").append(meta.className).append("> ").append(Strings.START_CURLY_BRACKET)
             .toString();
     }
 
@@ -77,17 +87,12 @@ public class ActiveRecordImplFactory {
         return meta.className + "." + key;
     }
 
-    private String constructors(MetaData meta, String idName) {
-        Optional<String> idType = meta.fieldsTypes.entrySet().stream()
-            .filter(e -> e.getKey().equalsIgnoreCase(idName)).map(Map.Entry::getValue).findFirst();
-        if (!idType.isPresent()) {
-            throw new RuntimeException(String.format("Can't find id %s in %s", idName, meta.fieldsTypes));
-        }
+    private String constructors(MetaData meta, String idName, String idType) {
         return new StringBuilder()
-            .append(constructorPrefix(meta.className)).append(", ").append(ID_TYPE_TRANSLATION.get(idType.get()))
+            .append(constructorPrefix(meta.className)).append(", ").append(idType)
             .append(" ").append(ID).append(Strings.END_BRACKET).append(" ").append(Strings.START_CURLY_BRACKET)
             .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-            .append(superCall(meta, idName))
+            .append(superCall(meta, idName, idType))
             .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
             .append(Strings.EMPTY_LINE)
             .append(constructorPrefix(meta.className)).append(Strings.END_BRACKET)
@@ -105,11 +110,13 @@ public class ActiveRecordImplFactory {
             .toString();
     }
 
-    private String superCall(MetaData meta, String idName) {
+    //TODO is auto increment, id type?
+    private String superCall(MetaData meta, String idName, String idType) {
         StringBuilder builder = new StringBuilder()
             .append("super").append(Strings.START_BRACKET).append(QUERY_FACTORY_ARG).append(", ")
             .append(constant(meta, Strings.TABLE)).append(", ")
-            .append(newUpdateableColumn(constant(meta, idName) + ", " + ID));
+            .append(newUpdateableColumn(constant(meta, idName) + ", " + ID))
+            .append(", ").append(idType).append(".class").append(", ").append("true");
         int previousLength = 0;
         for (String c : meta.columnsLabels) {
             if (c.equals(idName)) {

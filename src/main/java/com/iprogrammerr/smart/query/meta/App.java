@@ -20,7 +20,7 @@ public class App {
     public void execute(Configuration configuration) throws Exception {
         Database database = new Database(configuration.jdbcUrl, configuration.databaseUser,
             configuration.databasePassword);
-        //database.setup();
+        database.setup();
 
         QueryFactory queryFactory = new SmartQueryFactory(database::connection, false);
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage);
@@ -43,6 +43,7 @@ public class App {
             String representation = tablesFactory.newRepresentation(meta);
             String activeImpl = implFactory.newImplementation(meta, t.idName);
 
+            System.out.println(activeImpl);
             saveClass(classesFile, meta.className, representation);
             saveClass(classesFile, implFactory.implName(meta.className), activeImpl);
         }
