@@ -48,7 +48,7 @@ public class ActiveRecordImplFactory {
             .append(OVERRIDE)
             .append(Strings.NEW_LINE).append(Strings.TAB)
             .append(fetchImplementation(meta))
-            .append(setters(meta))
+            .append(setters(meta, idInfo))
             .append(Strings.NEW_LINE)
             .append(Strings.END_CURLY_BRACKET)
             .toString();
@@ -60,7 +60,7 @@ public class ActiveRecordImplFactory {
         if (!idType.isPresent()) {
             throw new RuntimeException(String.format("Can't find id %s in %s", idName, meta.fieldsTypes));
         }
-        return ID_TYPE_TRANSLATION.get(idType.get());
+        return ID_TYPE_TRANSLATION.getOrDefault(idType.get(), idType.get());
     }
 
     private String prolog() {
@@ -84,16 +84,17 @@ public class ActiveRecordImplFactory {
         return className + "Record";
     }
 
-    private String constant(MetaData meta, String key) {
-        return meta.className + "." + key;
+    private String constant(String className, String key) {
+        return className + "." + key;
     }
 
     private String constructors(MetaData meta, IdInfo idInfo, String idType) {
+        String idArg = Strings.toCamelCase(idInfo.name);
         return new StringBuilder()
             .append(constructorPrefix(meta.className)).append(", ").append(idType)
-            .append(" ").append(ID).append(Strings.END_BRACKET).append(" ").append(Strings.START_CURLY_BRACKET)
+            .append(" ").append(idArg).append(Strings.END_BRACKET).append(" ").append(Strings.START_CURLY_BRACKET)
             .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-            .append(superCall(meta, idInfo, idType))
+            .append(superCall(meta, idInfo, idType, idArg))
             .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
             .append(Strings.EMPTY_LINE)
             .append(constructorPrefix(meta.className)).append(Strings.END_BRACKET)
@@ -111,12 +112,11 @@ public class ActiveRecordImplFactory {
             .toString();
     }
 
-    //TODO is auto increment, id type?
-    private String superCall(MetaData meta, IdInfo idInfo, String idType) {
+    private String superCall(MetaData meta, IdInfo idInfo, String idType, String idArg) {
         StringBuilder builder = new StringBuilder()
             .append("super").append(Strings.START_BRACKET).append(QUERY_FACTORY_ARG).append(", ")
-            .append(constant(meta, Strings.TABLE)).append(", ")
-            .append(newUpdateableColumn(constant(meta, idInfo.name) + ", " + ID))
+            .append(constant(meta.className, Strings.TABLE)).append(", ")
+            .append(newUpdateableColumn(constant(meta.className, idInfo.name) + ", " + idArg))
             .append(", ").append(idType).append(".class").append(", ").append(idInfo.autoIncrement);
         int previousLength = 0;
         for (String c : meta.columnsLabels) {
@@ -124,11 +124,13 @@ public class ActiveRecordImplFactory {
                 continue;
             }
             builder.append(", ");
-            if (builder.length() - previousLength > MAX_LINE_LENGTH) {
+            String arg = newUpdateableColumn(constant(meta.className, c));
+            boolean newLine = (builder.length() - previousLength + arg.length()) > MAX_LINE_LENGTH;
+            if (newLine) {
                 previousLength = builder.length();
                 builder.append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.DOUBLE_TAB);
             }
-            builder.append(newUpdateableColumn(constant(meta, c)));
+            builder.append(arg);
         }
         return builder.append(Strings.END_BRACKET).append(Strings.SEMICOLON).toString();
     }
@@ -153,26 +155,35 @@ public class ActiveRecordImplFactory {
             .toString();
     }
 
-    private String setters(MetaData data) {
+    private String setters(MetaData data, IdInfo idInfo) {
         StringBuilder builder = new StringBuilder();
         String className = implName(data.className);
         int i = 0;
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
-            builder.append(Strings.EMPTY_LINE).append(Strings.TAB)
-                .append(Strings.PUBLIC_MODIFIER).append(" ").append(className)
-                .append(" set").append(Strings.capitalized(e.getKey()))
-                .append(Strings.START_BRACKET)
-                .append(e.getValue()).append(" ").append(e.getKey())
-                .append(Strings.END_BRACKET)
-                .append(" ").append(Strings.START_CURLY_BRACKET)
-                .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-                .append("set(").append(constant(data, data.columnsLabels.get(i++)))
-                .append(Strings.COMMA).append(" ").append(e.getKey()).append(Strings.END_BRACKET)
-                .append(Strings.SEMICOLON)
-                .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append("return this;")
-                .append(Strings.NEW_LINE).append(Strings.TAB)
-                .append(Strings.END_CURLY_BRACKET);
+            if (idInfo.autoIncrement && e.getKey().equalsIgnoreCase(idInfo.name)) {
+                continue;
+            }
+            builder.append(setter(className, e.getKey(), e.getValue(),
+                constant(data.className, data.columnsLabels.get(i++))));
         }
         return builder.toString();
+    }
+
+    private String setter(String className, String field, String type, String column) {
+        return new StringBuilder().append(Strings.EMPTY_LINE).append(Strings.TAB)
+            .append(Strings.PUBLIC_MODIFIER).append(" ").append(className)
+            .append(" set").append(Strings.capitalized(field))
+            .append(Strings.START_BRACKET)
+            .append(type).append(" ").append(field)
+            .append(Strings.END_BRACKET)
+            .append(" ").append(Strings.START_CURLY_BRACKET)
+            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
+            .append("set(").append(column)
+            .append(Strings.COMMA).append(" ").append(field).append(Strings.END_BRACKET)
+            .append(Strings.SEMICOLON)
+            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append("return this;")
+            .append(Strings.NEW_LINE).append(Strings.TAB)
+            .append(Strings.END_CURLY_BRACKET)
+            .toString();
     }
 }

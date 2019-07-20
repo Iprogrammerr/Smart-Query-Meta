@@ -19,3 +19,10 @@ CREATE TABLE book (
 	PRIMARY KEY (id),
 	FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE CASCADE
 );
+
+DROP TABLE IF EXISTS organism;
+CREATE TABLE organism (
+	dna VARCHAR(255) NOT NULL,
+	name VARCHAR(100) NOT NULL,
+	PRIMARY KEY (dna)
+);

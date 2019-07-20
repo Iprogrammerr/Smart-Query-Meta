@@ -14,7 +14,6 @@ public class MetaTable {
 
     private static final Map<String, String> TYPES_MAPPING = new HashMap<>();
     private static final String CLASS_PARTS_SEPARATOR = ".";
-    private static final String NAMES_SEPARATOR = "_";
 
     static {
         TYPES_MAPPING.put("Boolean", "boolean");
@@ -46,27 +45,12 @@ public class MetaTable {
                 for (int i = 1; i <= meta.getColumnCount(); i++) {
                     String label = meta.getColumnLabel(i);
                     columnLabels.add(label);
-                    String field = name(label, false);
+                    String field = Strings.toCamelCase(label);
                     String type = typeName(meta.getColumnClassName(i));
                     ft.put(field, type);
                 }
-                return new MetaData(table, name(table, true), columnLabels, ft);
+                return new MetaData(table, Strings.toPascalCase(table), columnLabels, ft);
             });
-    }
-
-    private String name(String columnLabel, boolean pascalCase) {
-        String[] parts = columnLabel.toLowerCase().split(NAMES_SEPARATOR);
-        StringBuilder name = new StringBuilder();
-        String first = parts[0];
-        if (pascalCase) {
-            name.append(Character.toUpperCase(first.charAt(0))).append(first.substring(1));
-        } else {
-            name.append(first);
-        }
-        for (int i = 1; i < parts.length; i++) {
-            name.append(Strings.capitalized(parts[i]));
-        }
-        return name.toString();
     }
 
     private String typeName(String className) {
