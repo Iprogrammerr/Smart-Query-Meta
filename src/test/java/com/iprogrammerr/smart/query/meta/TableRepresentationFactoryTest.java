@@ -2,7 +2,8 @@ package com.iprogrammerr.smart.query.meta;
 
 import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.SmartQueryFactory;
-import com.iprogrammerr.smart.query.meta.meta.MetaTable;
+import com.iprogrammerr.smart.query.meta.data.MetaTable;
+import com.iprogrammerr.smart.query.meta.data.Tables;
 import com.iprogrammerr.smart.query.meta.factory.TableRepresentationFactory;
 import org.junit.Before;
 import org.junit.Test;

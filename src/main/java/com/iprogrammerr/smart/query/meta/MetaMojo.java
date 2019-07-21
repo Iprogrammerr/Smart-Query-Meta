@@ -1,7 +1,5 @@
-package com.iprogrammerr.smart.query.meta.meta;
+package com.iprogrammerr.smart.query.meta;
 
-import com.iprogrammerr.smart.query.meta.App;
-import com.iprogrammerr.smart.query.meta.Configuration;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;

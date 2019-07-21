@@ -1,6 +1,6 @@
 package com.iprogrammerr.smart.query.meta.factory;
 
-import com.iprogrammerr.smart.query.meta.meta.MetaData;
+import com.iprogrammerr.smart.query.meta.data.MetaData;
 
 import java.util.ArrayList;
 import java.util.Arrays;

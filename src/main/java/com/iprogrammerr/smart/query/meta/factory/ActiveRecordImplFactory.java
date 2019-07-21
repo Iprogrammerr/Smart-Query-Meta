@@ -1,7 +1,7 @@
 package com.iprogrammerr.smart.query.meta.factory;
 
-import com.iprogrammerr.smart.query.meta.IdInfo;
-import com.iprogrammerr.smart.query.meta.meta.MetaData;
+import com.iprogrammerr.smart.query.meta.data.IdInfo;
+import com.iprogrammerr.smart.query.meta.data.MetaData;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -2,10 +2,12 @@ package com.iprogrammerr.smart.query.meta;
 
 import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.SmartQueryFactory;
+import com.iprogrammerr.smart.query.meta.data.Table;
+import com.iprogrammerr.smart.query.meta.data.Tables;
 import com.iprogrammerr.smart.query.meta.factory.ActiveRecordImplFactory;
 import com.iprogrammerr.smart.query.meta.factory.TableRepresentationFactory;
-import com.iprogrammerr.smart.query.meta.meta.MetaData;
-import com.iprogrammerr.smart.query.meta.meta.MetaTable;
+import com.iprogrammerr.smart.query.meta.data.MetaData;
+import com.iprogrammerr.smart.query.meta.data.MetaTable;
 
 import java.io.File;
 import java.nio.file.Files;
