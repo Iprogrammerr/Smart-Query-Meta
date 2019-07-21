@@ -160,7 +160,7 @@ public class TableRepresentationFactory {
             builder.append(fieldInitialization(type + " " + field,
                 resultSetInvocation(e.getValue(), aliased(field))))
                 .append(Strings.NEW_LINE);
-            if (data.nullableFields.contains(field)) {
+            if (WAS_NULL_TYPES.contains(type) && data.nullableFields.contains(field)) {
                 builder.append(wasNull(field))
                     .append(Strings.NEW_LINE);
             }

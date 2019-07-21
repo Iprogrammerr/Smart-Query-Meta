@@ -42,7 +42,7 @@ public class App {
             MetaData meta = new MetaTable(queryFactory, t.name).data();
 
             String representation = tablesFactory.newRepresentation(meta);
-            String activeImpl = implFactory.newImplementation(meta, t.idInfo);
+            String activeImpl = implFactory.newImplementation(meta, t.metaId);
 
             saveClass(classesFile, meta.className, representation);
             saveClass(classesFile, implFactory.implName(meta.className), activeImpl);

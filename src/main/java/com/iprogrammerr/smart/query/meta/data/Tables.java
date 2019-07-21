@@ -40,7 +40,7 @@ public class Tables {
         idRs.next();
         String idColumn = idRs.getString(ID_KEY);
         boolean autoIncrement = hasAutoIncrementId(table, idColumn);
-        return new Table(table, new IdInfo(idColumn, autoIncrement));
+        return new Table(table, new MetaId(idColumn, autoIncrement));
     }
 
     private boolean hasAutoIncrementId(String table, String idColumn) {

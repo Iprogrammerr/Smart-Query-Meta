@@ -1,6 +1,6 @@
 package com.iprogrammerr.smart.query.meta.factory;
 
-import com.iprogrammerr.smart.query.meta.data.IdInfo;
+import com.iprogrammerr.smart.query.meta.data.MetaId;
 import com.iprogrammerr.smart.query.meta.data.MetaData;
 
 import java.util.Arrays;
@@ -26,19 +26,19 @@ public class ActiveRecordImplFactory {
         this.packageName = packageName;
     }
 
-    public String newImplementation(MetaData meta, IdInfo idInfo) {
-        String idType = idType(meta, idInfo.name);
+    public String newImplementation(MetaData meta, MetaId metaId) {
+        String idType = idType(meta, metaId.name);
         return new StringBuilder()
             .append(prolog())
             .append(Strings.NEW_LINE)
             .append(header(meta, idType))
             .append(Strings.EMPTY_LINE)
-            .append(constructors(meta, idInfo, idType))
+            .append(constructors(meta, metaId, idType))
             .append(Strings.EMPTY_LINE).append(Strings.TAB)
             .append(OVERRIDE)
             .append(Strings.NEW_LINE).append(Strings.TAB)
             .append(fetchImplementation(meta))
-            .append(setters(meta, idInfo))
+            .append(setters(meta, metaId))
             .append(Strings.NEW_LINE)
             .append(Strings.END_CURLY_BRACKET)
             .toString();
@@ -78,13 +78,13 @@ public class ActiveRecordImplFactory {
         return className + "." + key;
     }
 
-    private String constructors(MetaData meta, IdInfo idInfo, String idType) {
-        String idArg = Strings.toCamelCase(idInfo.name);
+    private String constructors(MetaData meta, MetaId metaId, String idType) {
+        String idArg = Strings.toCamelCase(metaId.name);
         return new StringBuilder()
             .append(constructorPrefix(meta.className)).append(", ").append(idType)
             .append(" ").append(idArg).append(Strings.END_BRACKET).append(" ").append(Strings.START_CURLY_BRACKET)
             .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-            .append(superCall(meta, idInfo, idType, idArg))
+            .append(superCall(meta, metaId, idType, idArg))
             .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
             .append(Strings.EMPTY_LINE)
             .append(constructorPrefix(meta.className)).append(Strings.END_BRACKET)
@@ -102,15 +102,15 @@ public class ActiveRecordImplFactory {
             .toString();
     }
 
-    private String superCall(MetaData meta, IdInfo idInfo, String idType, String idArg) {
+    private String superCall(MetaData meta, MetaId metaId, String idType, String idArg) {
         StringBuilder builder = new StringBuilder()
             .append("super").append(Strings.START_BRACKET).append(QUERY_FACTORY_ARG).append(", ")
             .append(constant(meta.className, Strings.TABLE)).append(", ")
-            .append(newUpdateableColumn(constant(meta.className, idInfo.name) + ", " + idArg))
-            .append(", ").append(idType).append(".class").append(", ").append(idInfo.autoIncrement);
+            .append(newUpdateableColumn(constant(meta.className, metaId.name) + ", " + idArg))
+            .append(", ").append(idType).append(".class").append(", ").append(metaId.autoIncrement);
         int previousLength = 0;
         for (String c : meta.columnsLabels) {
-            if (c.equals(idInfo.name)) {
+            if (c.equals(metaId.name)) {
                 continue;
             }
             builder.append(", ");
@@ -145,13 +145,13 @@ public class ActiveRecordImplFactory {
             .toString();
     }
 
-    private String setters(MetaData data, IdInfo idInfo) {
+    private String setters(MetaData data, MetaId metaId) {
         StringBuilder builder = new StringBuilder();
         String className = implName(data.className);
         int i = 0;
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
             String cl = data.columnsLabels.get(i++);
-            if (idInfo.autoIncrement && e.getKey().equalsIgnoreCase(idInfo.name)) {
+            if (metaId.autoIncrement && e.getKey().equalsIgnoreCase(metaId.name)) {
                 continue;
             }
             builder.append(setter(className, e.getKey(), e.getValue(), constant(data.className, cl)));
