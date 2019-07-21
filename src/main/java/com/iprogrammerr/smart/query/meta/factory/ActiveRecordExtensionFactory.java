@@ -30,7 +30,7 @@ public class ActiveRecordExtensionFactory {
         String idType = idType(meta, metaId.name);
         return new StringBuilder()
             .append(TextElements.classProlog(packageName, IMPORTS))
-            .append(TextElements.NEW_LINE)
+            .append(TextElements.EMPTY_LINE)
             .append(header(meta, idType))
             .append(TextElements.EMPTY_LINE)
             .append(constructors(meta, metaId, idType))

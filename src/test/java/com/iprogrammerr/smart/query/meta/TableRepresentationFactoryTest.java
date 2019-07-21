@@ -5,15 +5,13 @@ import com.iprogrammerr.smart.query.SmartQueryFactory;
 import com.iprogrammerr.smart.query.meta.data.MetaTable;
 import com.iprogrammerr.smart.query.meta.data.Tables;
 import com.iprogrammerr.smart.query.meta.factory.TableRepresentationFactory;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
 
 public class TableRepresentationFactoryTest {
 
@@ -34,16 +32,13 @@ public class TableRepresentationFactoryTest {
     public void generatesTables() throws Exception {
         List<String> tables = new Tables(database.connection()).all().stream()
             .map(t -> t.name).collect(Collectors.toList());
-
-        String expectedTable = tableFormula("Author");
-        assertEquals(expectedTable, factory.newRepresentation(new MetaTable(queryFactory, tables.get(0)).data()));
-
-        expectedTable = tableFormula("Book");
-        assertEquals(expectedTable, factory.newRepresentation(new MetaTable(queryFactory, tables.get(1)).data()));
+        generatesTable(tables.get(0), "Author");
+        generatesTable(tables.get(1), "Book");
     }
 
-    private String tableFormula(String table) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(getClass()
-            .getResource(String.format("/%s.java", table)).toURI())));
+    private void generatesTable(String table, String className) throws Exception {
+        String expectedTable = new JavaFile(className).content();
+        String actualTable = factory.newRepresentation(new MetaTable(queryFactory, table).data());
+        MatcherAssert.assertThat(actualTable, Matchers.equalTo(expectedTable));
     }
 }

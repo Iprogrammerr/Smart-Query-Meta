@@ -73,7 +73,8 @@ public class TableRepresentationFactory {
         }
         return new StringBuilder()
             .append(TextElements.classProlog(packageName, imports))
-            .append(TextElements.NEW_LINE).append(CLASS_PREFIX).append(" ")
+            .append(TextElements.EMPTY_LINE)
+            .append(CLASS_PREFIX).append(" ")
             .append(className).append(" ").append(TextElements.START_CURLY_BRACKET)
             .append(TextElements.EMPTY_LINE)
             .toString();

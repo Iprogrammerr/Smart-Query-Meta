@@ -57,9 +57,12 @@ public class TextElements {
     public static String classProlog(String packageName, List<String> imports) {
         StringBuilder builder = new StringBuilder()
             .append(PACKAGE_PREFIX).append(" ").append(packageName)
-            .append(SEMICOLON).append(TextElements.EMPTY_LINE);
-        for (String i : imports) {
-            builder.append(i).append(TextElements.NEW_LINE);
+            .append(SEMICOLON);
+        if (!imports.isEmpty()) {
+            builder.append(NEW_LINE);
+            for (String i : imports) {
+                builder.append(NEW_LINE).append(i);
+            }
         }
         return builder.toString();
     }
