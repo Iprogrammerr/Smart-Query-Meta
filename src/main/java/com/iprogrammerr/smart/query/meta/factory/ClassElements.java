@@ -1,6 +1,7 @@
 package com.iprogrammerr.smart.query.meta.factory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClassElements {
 
@@ -93,5 +94,9 @@ public class ClassElements {
 
     public static String argsInLines(List<String> args) {
         return argsInLines(0, args);
+    }
+
+    public static List<String> constants(List<String> strings) {
+        return strings.stream().map(String::toUpperCase).collect(Collectors.toList());
     }
 }
