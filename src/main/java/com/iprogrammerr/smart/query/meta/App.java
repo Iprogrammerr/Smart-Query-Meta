@@ -6,7 +6,7 @@ import com.iprogrammerr.smart.query.meta.data.MetaData;
 import com.iprogrammerr.smart.query.meta.data.MetaTable;
 import com.iprogrammerr.smart.query.meta.data.Table;
 import com.iprogrammerr.smart.query.meta.data.Tables;
-import com.iprogrammerr.smart.query.meta.factory.ActiveRecordImplFactory;
+import com.iprogrammerr.smart.query.meta.factory.ActiveRecordExtensionFactory;
 import com.iprogrammerr.smart.query.meta.factory.TableRepresentationFactory;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public class App {
 
         QueryFactory queryFactory = new SmartQueryFactory(database::connection, false);
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage);
-        ActiveRecordImplFactory implFactory = new ActiveRecordImplFactory(configuration.classesPackage);
+        ActiveRecordExtensionFactory implFactory = new ActiveRecordExtensionFactory(configuration.classesPackage);
         List<Table> tables = new Tables(database.connection()).all();
 
         File classesFile = new File(configuration.classesPath);
@@ -42,7 +42,7 @@ public class App {
             MetaData meta = new MetaTable(queryFactory, t.name).data();
 
             String representation = tablesFactory.newRepresentation(meta);
-            String activeImpl = implFactory.newImplementation(meta, t.metaId);
+            String activeImpl = implFactory.newExtension(meta, t.metaId);
 
             saveClass(classesFile, meta.className, representation);
             saveClass(classesFile, implFactory.implName(meta.className), activeImpl);

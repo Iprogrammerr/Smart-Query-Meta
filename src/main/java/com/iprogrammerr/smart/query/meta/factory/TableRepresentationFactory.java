@@ -59,62 +59,64 @@ public class TableRepresentationFactory {
             .append(fields(data))
             .append(constructor(data.className, data.fieldsTypes))
             .append(factories(data))
-            .append(Strings.NEW_LINE).append(Strings.END_CURLY_BRACKET)
+            .append(TextElements.NEW_LINE).append(TextElements.END_CURLY_BRACKET)
             .toString();
     }
 
     private String header(String className, boolean hasBlob) {
-        StringBuilder builder = new StringBuilder()
-            .append(Strings.PACKAGE_PREFIX).append(" ").append(packageName).append(Strings.SEMICOLON)
-            .append(Strings.EMPTY_LINE);
-        for (String i : IMPORTS) {
-            builder.append(i).append(Strings.NEW_LINE);
-        }
+        List<String> imports;
         if (hasBlob) {
-            builder.append(BLOB_IMPORT).append(Strings.NEW_LINE);
+            imports = new ArrayList<>(IMPORTS);
+            imports.add(BLOB_IMPORT);
+        } else {
+            imports = IMPORTS;
         }
-        return builder.append(Strings.NEW_LINE)
-            .append(CLASS_PREFIX).append(" ").append(className).append(" ").append(Strings.START_CURLY_BRACKET)
-            .append(Strings.EMPTY_LINE).toString();
+        return new StringBuilder()
+            .append(TextElements.classProlog(packageName, imports))
+            .append(TextElements.NEW_LINE).append(CLASS_PREFIX).append(" ")
+            .append(className).append(" ").append(TextElements.START_CURLY_BRACKET)
+            .append(TextElements.EMPTY_LINE)
+            .toString();
     }
 
     private String fields(MetaData data) {
         StringBuilder builder = new StringBuilder();
-        builder.append(constant(Strings.TABLE, data.tableName));
+        builder.append(constant(TextElements.TABLE, data.tableName));
         for (String l : data.columnsLabels) {
             builder.append(constant(l.toUpperCase(), l.toLowerCase()));
         }
-        builder.append(Strings.NEW_LINE);
+        builder.append(TextElements.NEW_LINE);
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
-            builder.append(Strings.TAB).append(FIELD_MODIFIER).append(" ").append(e.getValue())
-                .append(" ").append(e.getKey()).append(Strings.SEMICOLON).append(Strings.NEW_LINE);
+            builder.append(TextElements.TAB).append(FIELD_MODIFIER).append(" ").append(e.getValue())
+                .append(" ").append(e.getKey()).append(TextElements.SEMICOLON).append(TextElements.NEW_LINE);
         }
-        builder.append(Strings.NEW_LINE);
+        builder.append(TextElements.NEW_LINE);
         return builder.toString();
     }
 
     private String constant(String name, String value) {
-        return new StringBuilder().append(Strings.TAB).append(CONSTANTS_MODIFIED)
+        return new StringBuilder().append(TextElements.TAB).append(CONSTANTS_MODIFIED)
             .append(" ").append(STRING).append(" ").append(name)
             .append(SPACED_EQUAL).append("\"").append(value).append("\"")
-            .append(Strings.SEMICOLON).append(Strings.NEW_LINE)
+            .append(TextElements.SEMICOLON).append(TextElements.NEW_LINE)
             .toString();
     }
 
     private String constructor(String className, Map<String, String> fieldsTypes) {
         StringBuilder builder = new StringBuilder();
-        builder.append(Strings.TAB).append(Strings.PUBLIC_MODIFIER).append(" ").append(className)
-            .append(Strings.START_BRACKET);
+        builder.append(TextElements.TAB).append(TextElements.PUBLIC_MODIFIER).append(" ").append(className)
+            .append(TextElements.START_BRACKET);
         List<String> args = fieldsTypes.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
             .collect(Collectors.toList());
-        builder.append(methodArgs(builder.length(), args)).append(Strings.END_BRACKET).append(" ")
-            .append(Strings.START_CURLY_BRACKET);
+        builder.append(methodArgs(builder.length(), args)).append(TextElements.END_BRACKET).append(" ")
+            .append(TextElements.START_CURLY_BRACKET);
         for (String f : fieldsTypes.keySet()) {
-            builder.append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-                .append(Strings.THIS).append(Strings.DOT).append(f).append(SPACED_EQUAL).append(f)
-                .append(Strings.SEMICOLON);
+            builder.append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB)
+                .append(TextElements.THIS).append(TextElements.DOT).append(f).append(SPACED_EQUAL).append(f)
+                .append(TextElements.SEMICOLON);
         }
-        return builder.append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET).toString();
+        return builder.append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.END_CURLY_BRACKET)
+            .toString();
     }
 
     private String methodArgs(int firstLineOffset, List<String> args) {
@@ -122,9 +124,9 @@ public class TableRepresentationFactory {
         builder.append(args.get(0));
         int previousLineLength = 0;
         for (int i = 1; i < args.size(); i++) {
-            builder.append(Strings.COMMA).append(" ");
+            builder.append(TextElements.COMMA).append(" ");
             if (((firstLineOffset + builder.length()) - previousLineLength) > MAX_ARG_LINE_SIZE) {
-                builder.append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB);
+                builder.append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB);
                 previousLineLength = builder.length();
                 firstLineOffset = 0;
             }
@@ -136,13 +138,13 @@ public class TableRepresentationFactory {
 
     private String factories(MetaData data) {
         return new StringBuilder()
-            .append(Strings.EMPTY_LINE)
+            .append(TextElements.EMPTY_LINE)
             .append(singleAliasedFactory(data))
-            .append(Strings.EMPTY_LINE)
+            .append(TextElements.EMPTY_LINE)
             .append(singleFactory(data))
-            .append(Strings.EMPTY_LINE)
+            .append(TextElements.EMPTY_LINE)
             .append(aliasedListFactory(data))
-            .append(Strings.EMPTY_LINE)
+            .append(TextElements.EMPTY_LINE)
             .append(listFactory(data))
             .toString();
     }
@@ -151,28 +153,28 @@ public class TableRepresentationFactory {
         StringBuilder builder = new StringBuilder();
         builder.append(factoryPrefix(false, data.className))
             .append(aliasedFactoryArgs(builder.length(), data.fieldsTypes))
-            .append(Strings.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
-            .append(" ").append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE);
+            .append(TextElements.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
+            .append(" ").append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE);
 
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
             String field = e.getKey();
             String type = e.getValue();
             builder.append(fieldInitialization(type + " " + field,
                 resultSetInvocation(e.getValue(), aliased(field))))
-                .append(Strings.NEW_LINE);
+                .append(TextElements.NEW_LINE);
             if (WAS_NULL_TYPES.contains(type) && data.nullableFields.contains(field)) {
                 builder.append(wasNull(field))
-                    .append(Strings.NEW_LINE);
+                    .append(TextElements.NEW_LINE);
             }
 
         }
 
         int offset = builder.length();
-        return builder.append(Strings.DOUBLE_TAB).append("return new ").append(data.className)
-            .append(Strings.START_BRACKET)
+        return builder.append(TextElements.DOUBLE_TAB).append("return new ").append(data.className)
+            .append(TextElements.START_BRACKET)
             .append(methodArgs(builder.length() - offset, new ArrayList<>(data.fieldsTypes.keySet())))
-            .append(Strings.END_BRACKET).append(Strings.SEMICOLON)
-            .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
+            .append(TextElements.END_BRACKET).append(TextElements.SEMICOLON)
+            .append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.END_CURLY_BRACKET)
             .toString();
     }
 
@@ -186,11 +188,11 @@ public class TableRepresentationFactory {
 
     private String wasNull(String field) {
         return new StringBuilder()
-            .append(Strings.DOUBLE_TAB).append("if(").append(RESULT_SET_ARG_NAME).append(".wasNull()) ")
-            .append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE)
-            .append(Strings.DOUBLE_TAB).append(Strings.TAB)
-            .append(field).append(SPACED_EQUAL).append("null;").append(Strings.NEW_LINE)
-            .append(Strings.DOUBLE_TAB).append(Strings.END_CURLY_BRACKET)
+            .append(TextElements.DOUBLE_TAB).append("if(").append(RESULT_SET_ARG_NAME).append(".wasNull()) ")
+            .append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE)
+            .append(TextElements.DOUBLE_TAB).append(TextElements.TAB)
+            .append(field).append(SPACED_EQUAL).append("null;").append(TextElements.NEW_LINE)
+            .append(TextElements.DOUBLE_TAB).append(TextElements.END_CURLY_BRACKET)
             .toString();
     }
 
@@ -204,13 +206,13 @@ public class TableRepresentationFactory {
 
     private String factoryPrefix(boolean list, String className) {
         StringBuilder builder = new StringBuilder()
-            .append(Strings.TAB).append(FACTORIES_MODIFIER).append(" ");
+            .append(TextElements.TAB).append(FACTORIES_MODIFIER).append(" ");
         if (list) {
             builder.append(list(className)).append(" ").append(LIST_FACTORY_NAME);
         } else {
-            builder.append(className).append(" ").append(Strings.FACTORY_NAME);
+            builder.append(className).append(" ").append(TextElements.FACTORY_NAME);
         }
-        return builder.append(Strings.START_BRACKET)
+        return builder.append(TextElements.START_BRACKET)
             .toString();
     }
 
@@ -222,11 +224,12 @@ public class TableRepresentationFactory {
         return new StringBuilder()
             .append(factoryPrefix(false, data.className))
             .append(RESULT_SET).append(" ").append(RESULT_SET_ARG_NAME)
-            .append(Strings.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
-            .append(" ").append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE)
-            .append(Strings.DOUBLE_TAB).append("return ")
+            .append(TextElements.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
+            .append(" ").append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE)
+            .append(TextElements.DOUBLE_TAB).append("return ")
             .append(constantsFactoryInvocation(data.columnsLabels))
-            .append(Strings.SEMICOLON).append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
+            .append(TextElements.SEMICOLON).append(TextElements.NEW_LINE).append(TextElements.TAB)
+            .append(TextElements.END_CURLY_BRACKET)
             .toString();
     }
 
@@ -237,12 +240,12 @@ public class TableRepresentationFactory {
 
     private String factoryInvocation(boolean list, String arg, List<String> args) {
         StringBuilder builder = new StringBuilder()
-            .append(list ? LIST_FACTORY_NAME : Strings.FACTORY_NAME).append(Strings.START_BRACKET)
+            .append(list ? LIST_FACTORY_NAME : TextElements.FACTORY_NAME).append(TextElements.START_BRACKET)
             .append(arg);
         for (String a : args) {
-            builder.append(Strings.COMMA).append(" ").append(a);
+            builder.append(TextElements.COMMA).append(" ").append(a);
         }
-        return builder.append(Strings.END_BRACKET).toString();
+        return builder.append(TextElements.END_BRACKET).toString();
     }
 
     private String aliased(String name) {
@@ -253,10 +256,10 @@ public class TableRepresentationFactory {
         StringBuilder builder = new StringBuilder()
             .append(factoryPrefix(true, data.className));
         return builder.append(aliasedFactoryArgs(builder.length(), data.fieldsTypes))
-            .append(Strings.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
-            .append(" ").append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE)
+            .append(TextElements.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
+            .append(" ").append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE)
             .append(listMapping(data))
-            .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
+            .append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.END_CURLY_BRACKET)
             .toString();
     }
 
@@ -264,44 +267,45 @@ public class TableRepresentationFactory {
         return new StringBuilder()
             .append(factoryPrefix(true, data.className))
             .append(RESULT_SET).append(" ").append(RESULT_SET_ARG_NAME)
-            .append(Strings.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
-            .append(" ").append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE)
-            .append(Strings.DOUBLE_TAB).append("return ")
+            .append(TextElements.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
+            .append(" ").append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE)
+            .append(TextElements.DOUBLE_TAB).append("return ")
             .append(factoryInvocation(true, RESULT_SET_ARG_NAME, data.columnsLabels.stream()
                 .map(String::toUpperCase).collect(Collectors.toList()))).append(";")
-            .append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET)
+            .append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.END_CURLY_BRACKET)
             .toString();
     }
 
     private String listMapping(MetaData meta) {
         return new StringBuilder()
-            .append(Strings.DOUBLE_TAB)
+            .append(TextElements.DOUBLE_TAB)
             .append(list(meta.className)).append(" ").append(LIST_NAME).append(SPACED_EQUAL).append(INITIALIZED_LIST)
-            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-            .append("do ").append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-            .append(Strings.TAB)
+            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB)
+            .append("do ").append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE)
+            .append(TextElements.DOUBLE_TAB)
+            .append(TextElements.TAB)
             .append(LIST_NAME).append(".add(").append(factoryInvocation(false, RESULT_SET_ARG_NAME,
                 aliasedArgsNames(meta.fieldsTypes))).append(");")
-            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append(Strings.END_CURLY_BRACKET)
-            .append(" while (").append(RESULT_SET_ARG_NAME).append(Strings.DOT).append("next()").append(");")
-            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append("return ").append(LIST_NAME)
-            .append(Strings.SEMICOLON)
+            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB).append(TextElements.END_CURLY_BRACKET)
+            .append(" while (").append(RESULT_SET_ARG_NAME).append(TextElements.DOT).append("next()").append(");")
+            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB).append("return ").append(LIST_NAME)
+            .append(TextElements.SEMICOLON)
             .toString();
     }
 
     private String resultSetInvocation(String type, String key) {
         return new StringBuilder()
-            .append(RESULT_SET_ARG_NAME).append(Strings.DOT).append("get")
-            .append(Strings.capitalized(TYPE_RESULT_SET_TYPE.getOrDefault(type, type)))
-            .append(Strings.START_BRACKET)
+            .append(RESULT_SET_ARG_NAME).append(TextElements.DOT).append("get")
+            .append(TextElements.capitalized(TYPE_RESULT_SET_TYPE.getOrDefault(type, type)))
+            .append(TextElements.START_BRACKET)
             .append(key)
-            .append(Strings.END_BRACKET)
+            .append(TextElements.END_BRACKET)
             .toString();
     }
 
     private String fieldInitialization(String field, String value) {
-        return new StringBuilder().append(Strings.DOUBLE_TAB)
-            .append(field).append(SPACED_EQUAL).append(value).append(Strings.SEMICOLON)
+        return new StringBuilder().append(TextElements.DOUBLE_TAB)
+            .append(field).append(SPACED_EQUAL).append(value).append(TextElements.SEMICOLON)
             .toString();
     }
 }

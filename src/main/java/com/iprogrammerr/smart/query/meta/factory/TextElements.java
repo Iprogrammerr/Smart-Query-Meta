@@ -1,6 +1,8 @@
 package com.iprogrammerr.smart.query.meta.factory;
 
-public class Strings {
+import java.util.List;
+
+public class TextElements {
 
     public static final String TABLE = "TABLE";
     public static final String PACKAGE_PREFIX = "package";
@@ -47,7 +49,17 @@ public class Strings {
             builder.append(first);
         }
         for (int i = 1; i < parts.length; i++) {
-            builder.append(Strings.capitalized(parts[i]));
+            builder.append(TextElements.capitalized(parts[i]));
+        }
+        return builder.toString();
+    }
+
+    public static String classProlog(String packageName, List<String> imports) {
+        StringBuilder builder = new StringBuilder()
+            .append(PACKAGE_PREFIX).append(" ").append(packageName)
+            .append(SEMICOLON).append(TextElements.EMPTY_LINE);
+        for (String i : imports) {
+            builder.append(i).append(TextElements.NEW_LINE);
         }
         return builder.toString();
     }
