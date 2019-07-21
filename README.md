@@ -200,7 +200,7 @@ public class AuthorRecord extends ActiveRecord<Integer, Author> {
 
     public AuthorRecord setAlive(Byte alive) {  
         set(Author.ALIVE, alive);
-	    return this;    
+        return this;    
     }
 }
 
@@ -235,9 +235,9 @@ public class BookRecord extends ActiveRecord<Integer, Book> {
         return this; 
     }
 
-    public BookRecord setTitle(String title) {
-	    set(Book.TITLE, title);
-	    return this; 
+    public BookRecord setTitle(String title) { 
+        set(Book.TITLE, title);
+        return this; 
     }
 
     public BookRecord setYearOfPublication(Integer yearOfPublication) {     
