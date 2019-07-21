@@ -5,8 +5,10 @@ import com.iprogrammerr.smart.query.meta.data.MetaData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TableRepresentationFactory {
@@ -30,10 +32,20 @@ public class TableRepresentationFactory {
     private static final String LIST_NAME = "list";
     private static final String INITIALIZED_LIST = "new ArrayList<>();";
     private static final Map<String, String> TYPE_RESULT_SET_TYPE = new HashMap<>();
+    private static final Set<String> WAS_NULL_TYPES = new HashSet<>();
 
     static {
         TYPE_RESULT_SET_TYPE.put("Integer", "int");
+        WAS_NULL_TYPES.add("Double");
+        WAS_NULL_TYPES.add("Float");
+        WAS_NULL_TYPES.add("Long");
+        WAS_NULL_TYPES.add("Integer");
+        WAS_NULL_TYPES.add("Short");
+        WAS_NULL_TYPES.add("Character");
+        WAS_NULL_TYPES.add("Byte");
+        WAS_NULL_TYPES.add("Boolean");
     }
+
 
     private final String packageName;
 
@@ -141,11 +153,20 @@ public class TableRepresentationFactory {
             .append(aliasedFactoryArgs(builder.length(), data.fieldsTypes))
             .append(Strings.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
             .append(" ").append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE);
+
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
-            builder.append(fieldInitialization(e.getValue() + " " + e.getKey(),
-                resultSetInvocation(e.getValue(), aliased(e.getKey()))))
+            String field = e.getKey();
+            String type = e.getValue();
+            builder.append(fieldInitialization(type + " " + field,
+                resultSetInvocation(e.getValue(), aliased(field))))
                 .append(Strings.NEW_LINE);
+            if (data.nullableFields.contains(field)) {
+                builder.append(wasNull(field))
+                    .append(Strings.NEW_LINE);
+            }
+
         }
+
         int offset = builder.length();
         return builder.append(Strings.DOUBLE_TAB).append("return new ").append(data.className)
             .append(Strings.START_BRACKET)
@@ -161,6 +182,16 @@ public class TableRepresentationFactory {
         args.addAll(fieldsTypes.keySet().stream().map(f -> STRING + " " + aliased(f))
             .collect(Collectors.toList()));
         return methodArgs(firstLineOffset, args);
+    }
+
+    private String wasNull(String field) {
+        return new StringBuilder()
+            .append(Strings.DOUBLE_TAB).append("if(").append(RESULT_SET_ARG_NAME).append(".wasNull()) ")
+            .append(Strings.START_CURLY_BRACKET).append(Strings.NEW_LINE)
+            .append(Strings.DOUBLE_TAB).append(Strings.TAB)
+            .append(field).append(SPACED_EQUAL).append("null;").append(Strings.NEW_LINE)
+            .append(Strings.DOUBLE_TAB).append(Strings.END_CURLY_BRACKET)
+            .toString();
     }
 
     private String resultSetArg() {

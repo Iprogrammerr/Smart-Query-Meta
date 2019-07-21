@@ -3,12 +3,15 @@ package com.iprogrammerr.smart.query.meta.data;
 import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.meta.factory.Strings;
 
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MetaTable {
 
@@ -31,19 +34,25 @@ public class MetaTable {
         return factory.newQuery().dsl()
             .selectAll().from(table).limit(1)
             .query()
-            .fetch(r -> {
-                List<String> columnLabels = new ArrayList<>();
-                Map<String, String> ft = new LinkedHashMap<>();
-                ResultSetMetaData meta = r.getMetaData();
-                for (int i = 1; i <= meta.getColumnCount(); i++) {
-                    String label = meta.getColumnLabel(i);
-                    columnLabels.add(label);
-                    String field = Strings.toCamelCase(label);
-                    String type = typeName(meta.getColumnClassName(i));
-                    ft.put(field, type);
-                }
-                return new MetaData(table, Strings.toPascalCase(table), columnLabels, ft);
-            });
+            .fetch(this::dataFromResult);
+    }
+
+    private MetaData dataFromResult(ResultSet result) throws Exception {
+        List<String> columnLabels = new ArrayList<>();
+        Map<String, String> fieldsTypes = new LinkedHashMap<>();
+        Set<String> nullableFields = new HashSet<>();
+        ResultSetMetaData meta = result.getMetaData();
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            String label = meta.getColumnLabel(i);
+            columnLabels.add(label);
+            String field = Strings.toCamelCase(label);
+            String type = typeName(meta.getColumnClassName(i));
+            fieldsTypes.put(field, type);
+            if (meta.isNullable(i) == ResultSetMetaData.columnNullable) {
+                nullableFields.add(field);
+            }
+        }
+        return new MetaData(table, Strings.toPascalCase(table), columnLabels, fieldsTypes, nullableFields);
     }
 
     private String typeName(String className) {
