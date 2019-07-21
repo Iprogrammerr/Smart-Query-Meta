@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class TableRepresentationFactory {
 
     private static final int MAX_ARG_LINE_SIZE = 100;
-    private static final List<String> IMPORTS = Arrays.asList("import java.sql.ResultSet;", "import java.util.List;",
-        "import java.util.ArrayList;");
+    private static final List<String> IMPORTS = Arrays.asList("import java.sql.ResultSet;",
+        "import java.util.ArrayList;", "import java.util.List;");
     private static final String BLOB_IMPORT = "import java.sql.Blob;";
     private static final String BLOB = "Blob";
     private static final String CONSTANTS_MODIFIED = "public static final";
@@ -92,7 +92,8 @@ public class TableRepresentationFactory {
             .append(Strings.START_CURLY_BRACKET);
         for (String f : fieldsTypes.keySet()) {
             builder.append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB)
-                .append(Strings.THIS).append(Strings.DOT).append(f).append(SPACED_EQUAL).append(f).append(Strings.SEMICOLON);
+                .append(Strings.THIS).append(Strings.DOT).append(f).append(SPACED_EQUAL).append(f)
+                .append(Strings.SEMICOLON);
         }
         return builder.append(Strings.NEW_LINE).append(Strings.TAB).append(Strings.END_CURLY_BRACKET).toString();
     }
@@ -245,7 +246,8 @@ public class TableRepresentationFactory {
                 aliasedArgsNames(meta.fieldsTypes))).append(");")
             .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append(Strings.END_CURLY_BRACKET)
             .append(" while (").append(RESULT_SET_ARG_NAME).append(Strings.DOT).append("next()").append(");")
-            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append("return ").append(LIST_NAME).append(Strings.SEMICOLON)
+            .append(Strings.NEW_LINE).append(Strings.DOUBLE_TAB).append("return ").append(LIST_NAME)
+            .append(Strings.SEMICOLON)
             .toString();
     }
 

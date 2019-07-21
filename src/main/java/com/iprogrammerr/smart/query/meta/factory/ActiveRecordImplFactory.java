@@ -160,11 +160,11 @@ public class ActiveRecordImplFactory {
         String className = implName(data.className);
         int i = 0;
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
+            String cl = data.columnsLabels.get(i++);
             if (idInfo.autoIncrement && e.getKey().equalsIgnoreCase(idInfo.name)) {
                 continue;
             }
-            builder.append(setter(className, e.getKey(), e.getValue(),
-                constant(data.className, data.columnsLabels.get(i++))));
+            builder.append(setter(className, e.getKey(), e.getValue(), constant(data.className, cl)));
         }
         return builder.toString();
     }
