@@ -18,7 +18,6 @@ public class ActiveRecordExtensionFactory {
     private static final String QUERY_FACTORY = "QueryFactory";
     private static final String QUERY_FACTORY_ARG = "factory";
     private static final String PUBLIC = "public";
-    private static final String ID = "id";
     private static final String PARENT_FETCH = "fetchQuery()";
     private final String packageName;
 
@@ -29,18 +28,18 @@ public class ActiveRecordExtensionFactory {
     public String newExtension(MetaData meta, MetaId metaId) {
         String idType = idType(meta, metaId.name);
         return new StringBuilder()
-            .append(TextElements.classProlog(packageName, IMPORTS))
-            .append(TextElements.EMPTY_LINE)
+            .append(ClassElements.classProlog(packageName, IMPORTS))
+            .append(ClassElements.EMPTY_LINE)
             .append(header(meta, idType))
-            .append(TextElements.EMPTY_LINE)
+            .append(ClassElements.EMPTY_LINE)
             .append(constructors(meta, metaId, idType))
-            .append(TextElements.EMPTY_LINE).append(TextElements.TAB)
+            .append(ClassElements.EMPTY_LINE).append(ClassElements.TAB)
             .append(OVERRIDE)
-            .append(TextElements.NEW_LINE).append(TextElements.TAB)
+            .append(ClassElements.NEW_LINE).append(ClassElements.TAB)
             .append(fetchImplementation(meta))
             .append(setters(meta, metaId))
-            .append(TextElements.NEW_LINE)
-            .append(TextElements.END_CURLY_BRACKET)
+            .append(ClassElements.NEW_LINE)
+            .append(ClassElements.END_CURLY_BRACKET)
             .toString();
     }
 
@@ -56,7 +55,7 @@ public class ActiveRecordExtensionFactory {
     private String header(MetaData meta, String idType) {
         return new StringBuilder()
             .append("public class ").append(implName(meta.className)).append(" extends ActiveRecord<")
-            .append(idType).append(", ").append(meta.className).append("> ").append(TextElements.START_CURLY_BRACKET)
+            .append(idType).append(", ").append(meta.className).append("> ").append(ClassElements.START_CURLY_BRACKET)
             .toString();
     }
 
@@ -69,33 +68,33 @@ public class ActiveRecordExtensionFactory {
     }
 
     private String constructors(MetaData meta, MetaId metaId, String idType) {
-        String idArg = TextElements.toCamelCase(metaId.name);
+        String idArg = ClassElements.toCamelCase(metaId.name);
         return new StringBuilder()
             .append(constructorPrefix(meta.className)).append(", ").append(idType)
-            .append(" ").append(idArg).append(TextElements.END_BRACKET).append(" ").append(TextElements.START_CURLY_BRACKET)
-            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB)
+            .append(" ").append(idArg).append(ClassElements.END_BRACKET).append(" ").append(ClassElements.START_CURLY_BRACKET)
+            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB)
             .append(superCall(meta, metaId, idType, idArg))
-            .append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.END_CURLY_BRACKET)
-            .append(TextElements.EMPTY_LINE)
-            .append(constructorPrefix(meta.className)).append(TextElements.END_BRACKET)
-            .append(" ").append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB)
-            .append("this(").append(QUERY_FACTORY_ARG).append(", null").append(TextElements.END_BRACKET)
-            .append(TextElements.SEMICOLON)
-            .append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.END_CURLY_BRACKET)
+            .append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.END_CURLY_BRACKET)
+            .append(ClassElements.EMPTY_LINE)
+            .append(constructorPrefix(meta.className)).append(ClassElements.END_BRACKET)
+            .append(" ").append(ClassElements.START_CURLY_BRACKET).append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB)
+            .append("this(").append(QUERY_FACTORY_ARG).append(", null").append(ClassElements.END_BRACKET)
+            .append(ClassElements.SEMICOLON)
+            .append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.END_CURLY_BRACKET)
             .toString();
     }
 
     private String constructorPrefix(String className) {
         return new StringBuilder()
-            .append(TextElements.TAB).append(PUBLIC).append(" ").append(implName(className)).append(TextElements.START_BRACKET)
+            .append(ClassElements.TAB).append(PUBLIC).append(" ").append(implName(className)).append(ClassElements.START_BRACKET)
             .append(QUERY_FACTORY).append(" ").append(QUERY_FACTORY_ARG)
             .toString();
     }
 
     private String superCall(MetaData meta, MetaId metaId, String idType, String idArg) {
         StringBuilder builder = new StringBuilder()
-            .append("super").append(TextElements.START_BRACKET).append(QUERY_FACTORY_ARG).append(", ")
-            .append(constant(meta.className, TextElements.TABLE)).append(", ")
+            .append("super").append(ClassElements.START_BRACKET).append(QUERY_FACTORY_ARG).append(", ")
+            .append(constant(meta.className, ClassElements.TABLE)).append(", ")
             .append(newUpdateableColumn(constant(meta.className, metaId.name) + ", " + idArg))
             .append(", ").append(idType).append(".class").append(", ").append(metaId.autoIncrement);
         int previousLength = 0;
@@ -108,11 +107,11 @@ public class ActiveRecordExtensionFactory {
             boolean newLine = (builder.length() - previousLength + arg.length()) > MAX_LINE_LENGTH;
             if (newLine) {
                 previousLength = builder.length();
-                builder.append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.DOUBLE_TAB);
+                builder.append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.DOUBLE_TAB);
             }
             builder.append(arg);
         }
-        return builder.append(TextElements.END_BRACKET).append(TextElements.SEMICOLON).toString();
+        return builder.append(ClassElements.END_BRACKET).append(ClassElements.SEMICOLON).toString();
     }
 
     private String newUpdateableColumn(String inner) {
@@ -121,18 +120,18 @@ public class ActiveRecordExtensionFactory {
 
     private String fetchImplementation(MetaData meta) {
         return new StringBuilder()
-            .append(PUBLIC).append(" ").append(meta.className).append(" fetch() ").append(TextElements.START_CURLY_BRACKET)
-            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB).append("return ").append(PARENT_FETCH)
+            .append(PUBLIC).append(" ").append(meta.className).append(" fetch() ").append(ClassElements.START_CURLY_BRACKET)
+            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append("return ").append(PARENT_FETCH)
             .append(".fetch(r -> ")
-            .append(TextElements.START_CURLY_BRACKET).append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB).append(
-                TextElements.TAB)
+            .append(ClassElements.START_CURLY_BRACKET).append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append(
+                ClassElements.TAB)
             .append("r.next();")
-            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB).append(TextElements.TAB).append("return ")
-            .append(meta.className).append(TextElements.DOT).append(TextElements.FACTORY_NAME).append("(r);")
-            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB).append(TextElements.END_CURLY_BRACKET)
-            .append(TextElements.END_BRACKET)
-            .append(TextElements.SEMICOLON)
-            .append(TextElements.NEW_LINE).append(TextElements.TAB).append(TextElements.END_CURLY_BRACKET)
+            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append(ClassElements.TAB).append("return ")
+            .append(meta.className).append(ClassElements.DOT).append(ClassElements.FACTORY_NAME).append("(r);")
+            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append(ClassElements.END_CURLY_BRACKET)
+            .append(ClassElements.END_BRACKET)
+            .append(ClassElements.SEMICOLON)
+            .append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.END_CURLY_BRACKET)
             .toString();
     }
 
@@ -151,20 +150,20 @@ public class ActiveRecordExtensionFactory {
     }
 
     private String setter(String className, String field, String type, String column) {
-        return new StringBuilder().append(TextElements.EMPTY_LINE).append(TextElements.TAB)
-            .append(TextElements.PUBLIC_MODIFIER).append(" ").append(className)
-            .append(" set").append(TextElements.capitalized(field))
-            .append(TextElements.START_BRACKET)
+        return new StringBuilder().append(ClassElements.EMPTY_LINE).append(ClassElements.TAB)
+            .append(ClassElements.PUBLIC_MODIFIER).append(" ").append(className)
+            .append(" set").append(ClassElements.capitalized(field))
+            .append(ClassElements.START_BRACKET)
             .append(type).append(" ").append(field)
-            .append(TextElements.END_BRACKET)
-            .append(" ").append(TextElements.START_CURLY_BRACKET)
-            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB)
+            .append(ClassElements.END_BRACKET)
+            .append(" ").append(ClassElements.START_CURLY_BRACKET)
+            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB)
             .append("set(").append(column)
-            .append(TextElements.COMMA).append(" ").append(field).append(TextElements.END_BRACKET)
-            .append(TextElements.SEMICOLON)
-            .append(TextElements.NEW_LINE).append(TextElements.DOUBLE_TAB).append("return this;")
-            .append(TextElements.NEW_LINE).append(TextElements.TAB)
-            .append(TextElements.END_CURLY_BRACKET)
+            .append(ClassElements.COMMA).append(" ").append(field).append(ClassElements.END_BRACKET)
+            .append(ClassElements.SEMICOLON)
+            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append("return this;")
+            .append(ClassElements.NEW_LINE).append(ClassElements.TAB)
+            .append(ClassElements.END_CURLY_BRACKET)
             .toString();
     }
 }

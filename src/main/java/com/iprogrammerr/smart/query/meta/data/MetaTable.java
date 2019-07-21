@@ -1,7 +1,7 @@
 package com.iprogrammerr.smart.query.meta.data;
 
 import com.iprogrammerr.smart.query.QueryFactory;
-import com.iprogrammerr.smart.query.meta.factory.TextElements;
+import com.iprogrammerr.smart.query.meta.factory.ClassElements;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -45,14 +45,14 @@ public class MetaTable {
         for (int i = 1; i <= meta.getColumnCount(); i++) {
             String label = meta.getColumnLabel(i);
             columnLabels.add(label);
-            String field = TextElements.toCamelCase(label);
+            String field = ClassElements.toCamelCase(label);
             String type = typeName(meta.getColumnClassName(i));
             fieldsTypes.put(field, type);
             if (meta.isNullable(i) == ResultSetMetaData.columnNullable) {
                 nullableFields.add(field);
             }
         }
-        return new MetaData(table, TextElements.toPascalCase(table), columnLabels, fieldsTypes, nullableFields);
+        return new MetaData(table, ClassElements.toPascalCase(table), columnLabels, fieldsTypes, nullableFields);
     }
 
     private String typeName(String className) {

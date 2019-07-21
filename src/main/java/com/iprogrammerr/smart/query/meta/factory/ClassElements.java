@@ -2,8 +2,9 @@ package com.iprogrammerr.smart.query.meta.factory;
 
 import java.util.List;
 
-public class TextElements {
+public class ClassElements {
 
+    public static final int MAX_LINE_LENGTH = 120;
     public static final String TABLE = "TABLE";
     public static final String PACKAGE_PREFIX = "package";
     public static final String START_CURLY_BRACKET = "{";
@@ -49,7 +50,7 @@ public class TextElements {
             builder.append(first);
         }
         for (int i = 1; i < parts.length; i++) {
-            builder.append(TextElements.capitalized(parts[i]));
+            builder.append(ClassElements.capitalized(parts[i]));
         }
         return builder.toString();
     }
@@ -65,5 +66,32 @@ public class TextElements {
             }
         }
         return builder.toString();
+    }
+
+    public static String argsInLines(int firstLineOffset, List<String> args, int lineMaxLength) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(args.get(0));
+        int previousLineLength = 0;
+        for (int i = 1; i < args.size(); i++) {
+            builder.append(COMMA).append(" ");
+            String arg = args.get(i);
+            boolean newLine = (firstLineOffset + builder.length() + arg.length() - previousLineLength) > lineMaxLength;
+            if (newLine) {
+                previousLineLength = builder.length();
+                firstLineOffset = 0;
+                builder.append(NEW_LINE).append(DOUBLE_TAB);
+            }
+            builder.append(arg);
+
+        }
+        return builder.toString();
+    }
+
+    public static String argsInLines(int firstLineOffset, List<String> args) {
+        return argsInLines(firstLineOffset, args, MAX_LINE_LENGTH);
+    }
+
+    public static String argsInLines(List<String> args) {
+        return argsInLines(0, args);
     }
 }
