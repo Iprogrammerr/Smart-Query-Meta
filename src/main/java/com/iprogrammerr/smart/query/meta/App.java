@@ -22,7 +22,7 @@ public class App {
     public void execute(Configuration configuration) throws Exception {
         Database database = new Database(configuration.jdbcUrl, configuration.databaseUser,
             configuration.databasePassword);
-        database.setup();
+        //database.setup();
 
         QueryFactory queryFactory = new SmartQueryFactory(database::connection, false);
         TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage);
