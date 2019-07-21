@@ -29,8 +29,7 @@ public class Database {
 
     public Connection connection() throws Exception {
         if (connection == null) {
-            connection = DriverManager.getConnection(jdbcUrl, databaseUser,
-                databasePassword);
+            connection = DriverManager.getConnection(jdbcUrl, databaseUser, databasePassword);
         }
         return connection;
     }

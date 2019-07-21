@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/Iprogrammerr/Smart-Query-Meta.svg?branch=master)](https://travis-ci.com/Iprogrammerr/Smart-Query-Meta)
 [![Test Coverage](https://img.shields.io/codecov/c/github/iprogrammerr/smart-query-meta/master.svg)](https://codecov.io/gh/Iprogrammerr/Smart-Query-Meta/branch/master)
 # Smart Query Meta
-SQL tables representation generator based on database connection.
+SQL tables representation and ActiveRecord extensions generator based on database connection.
 ## Usage
 ```
 mvn clean install
@@ -9,12 +9,14 @@ java -jar target/smart-query-meta-jar-with-dependecies.jar <path to application.
 ```
 Application.properties sample:
 ```
-database.user=test
-database.password=test
-jdbc.url=jdbc:h2:mem:test
-classes.package=com.iprogrammerr.smart.query.meta.table
+databaseUser=test
+databasePassword=test
+jdbcUrl=jdbc:h2:mem:test
+classesPackage=com.iprogrammerr.smart.query.meta.table
 #location of generated classes
-classes.path=/home/user/projects/project/target/generated/sources
+classesPath=/home/user/projects/project/target/generated/sources
+#whether to generate child classes of com.iprogrammerr.smart.query.active.ActiveRecord
+generateActiveRecords=true
 ```
 ## Example
 Schema:
@@ -41,7 +43,7 @@ CREATE TABLE book (
     FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE CASCADE
 );
 ```
-Output:
+Tables:
 ```java
 package com.iprogrammerr.smart.query.meta.table;
 
@@ -58,13 +60,13 @@ public class Author {
     public static final String ALIAS = "alias";
     public static final String ALIVE = "alive";
 
-    public final int id;
+    public final Integer id;
     public final String name;
     public final String surname;
     public final String alias;
-    public final byte alive;
+    public final Byte alive;
 
-    public Author(int id, String name, String surname, String alias, byte alive) {
+    public Author(int id, String name, String surname, String alias, Byte alive) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -74,11 +76,11 @@ public class Author {
 
     public static Author fromResult(ResultSet result, String idLabel, String nameLabel, String surnameLabel, 
         String aliasLabel, String aliveLabel) throws Exception {
-        int id = result.getInt(idLabel);
+        Integer id = result.getInt(idLabel);
         String name = result.getString(nameLabel);
         String surname = result.getString(surnameLabel);
         String alias = result.getString(aliasLabel);
-        byte alive = result.getByte(aliveLabel);
+        Byte alive = result.getByte(aliveLabel);
         return new Author(id, name, surname, alias, alive);
     }
     
@@ -114,12 +116,12 @@ public class Book {
     public static final String TITLE = "title";
     public static final String YEAR_OF_PUBLICATION = "year_of_publication";
 
-    public final int id;
-    public final int authorId;
+    public final Integer id;
+    public final Integer authorId;
     public final String title;
-    public final int yearOfPublication;
+    public final Integer yearOfPublication;
 
-    public Book(int id, int authorId, String title, int yearOfPublication) {
+    public Book(Integer id, Integer authorId, String title, Integer yearOfPublication) {
         this.id = id;
         this.authorId = authorId;
         this.title = title;
@@ -128,10 +130,10 @@ public class Book {
 
     public static Book fromResult(ResultSet result, String idLabel, String authorIdLabel, String titleLabel, 
 		String yearOfPublicationLabel) throws Exception {
-        int id = result.getInt(idLabel);
-        int authorId = result.getInt(authorIdLabel);
+        Integer id = result.getInt(idLabel);
+        Integer authorId = result.getInt(authorIdLabel);
         String title = result.getString(titleLabel);
-        int yearOfPublication = result.getInt(yearOfPublicationLabel);
+        Integer yearOfPublication = result.getInt(yearOfPublicationLabel);
         return new Book(id, authorId, title, yearOfPublication);
     }
 
@@ -150,6 +152,97 @@ public class Book {
 
     public static List<Book> listFromResult(ResultSet result) throws Exception {
         return fromListResult(result, ID, AUTHOR_ID, TITLE, YEAR_OF_PUBLICATION);
+    }
+}
+```
+ActiveRecords:
+```java
+package com.iprogrammerr.smart.query.meta.table;
+
+import com.iprogrammerr.smart.query.QueryFactory;
+import com.iprogrammerr.smart.query.active.ActiveRecord;
+import com.iprogrammerr.smart.query.active.UpdateableColumn;
+
+public class AuthorRecord extends ActiveRecord<Integer, Author> { 
+    
+    public AuthorRecord(QueryFactory factory, Integer id) {
+        super(factory, Author.TABLE, new UpdateableColumn<>(Author.ID, id), Integer.class, true, 
+            new UpdateableColumn<>(Author.NAME), new UpdateableColumn<>(Author.SURNAME), 
+            new UpdateableColumn<>(Author.ALIAS), new UpdateableColumn<>(Author.ALIVE)); 
+    }
+	
+    public AuthorRecord(QueryFactory factory) { 
+        this(factory, null); 
+    }
+    
+    @Override
+    public Author fetch() { 
+        return fetchQuery().fetch(r -> {
+            r.next();
+            return Author.fromResult(r); 
+        }); 
+    }
+    
+    public AuthorRecord setName(String name) {
+    	set(Author.NAME, name);
+	    return this; 
+    }
+    
+    public AuthorRecord setSurname(String surname) {
+	    set(Author.SURNAME, surname);
+	    return this; 
+    }
+
+    public AuthorRecord setAlias(String alias) { 
+        set(Author.ALIAS, alias);
+        return this; 
+    }
+
+    public AuthorRecord setAlive(Byte alive) {  
+        set(Author.ALIVE, alive);
+	    return this;    
+    }
+}
+
+package com.iprogrammerr.smart.query.meta.table;
+
+import com.iprogrammerr.smart.query.QueryFactory;
+import com.iprogrammerr.smart.query.active.ActiveRecord;
+import com.iprogrammerr.smart.query.active.UpdateableColumn;
+
+public class BookRecord extends ActiveRecord<Integer, Book> { 
+
+    public BookRecord(QueryFactory factory, Integer id) {
+	     super(factory, Book.TABLE, new UpdateableColumn<>(Book.ID, id), Integer.class, true, 
+	        new UpdateableColumn<>(Book.AUTHOR_ID), new UpdateableColumn<>(Book.TITLE), 
+	        new UpdateableColumn<>(Book.YEAR_OF_PUBLICATION)); 
+    }
+
+    public BookRecord(QueryFactory factory) { 
+        this(factory, null); 
+    }
+
+    @Override
+    public Book fetch() { 
+        return fetchQuery().fetch(r -> {
+            r.next();
+            return Book.fromResult(r); 
+        });     
+    }
+    
+    public BookRecord setAuthorId(Integer authorId) { 
+        set(Book.AUTHOR_ID, authorId);
+        return this; 
+    }
+
+    public BookRecord setTitle(String title) {
+	    set(Book.TITLE, title);
+	    return this; 
+    }
+
+    public BookRecord setYearOfPublication(Integer yearOfPublication) {     
+        set(Book.YEAR_OF_PUBLICATION, yearOfPublication);
+        return this; 
     }
 }
 ```
@@ -177,6 +270,18 @@ List<Book> books = queryFactory.newQuery().dsl()
         r.next();
         return Book.listFromResult(r);
     });
+
+AuthorRecord record = new AuthorRecord(queryFactory)
+    .setName("Lem")
+    .setSurname("Stanisław")
+    .setAlias("Visionary")
+    .setAlive((byte) 0);
+record.insert();
+
+author = record.fetch();        
+
+record.setAlias("LS");
+record.update();
 ```
 ## Supported databases
 * MySQL

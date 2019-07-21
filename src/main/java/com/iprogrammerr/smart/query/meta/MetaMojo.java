@@ -18,11 +18,15 @@ public class MetaMojo extends AbstractMojo {
     private String classesPackage;
     @Parameter
     private String classesPath;
+    @Parameter
+    private boolean generateActiveRecords;
 
     @Override
     public void execute() throws MojoFailureException {
         try {
-            new App().execute(new Configuration(jdbcUrl, databaseUser, databasePassword, classesPackage, classesPath));
+            Configuration configuration = new Configuration(jdbcUrl, databaseUser, databasePassword, classesPackage,
+                classesPath, generateActiveRecords);
+            new App().execute(configuration);
         } catch (Exception e) {
             throw new MojoFailureException("Failure while generating db representation", e);
         }

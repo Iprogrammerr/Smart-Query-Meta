@@ -34,18 +34,20 @@ public class App {
                 configuration.classesPath));
         }
 
-        System.out.println(String.format("Generating %s db tables representations:",
+        System.out.println(String.format("Generating %s db representations...",
             database.connection().getCatalog()));
         for (Table t : tables) {
-            System.out.println(t.name);
-
             MetaData meta = new MetaTable(queryFactory, t.name).data();
 
+            System.out.println(String.format("Table: %s", t.name));
             String representation = tablesFactory.newRepresentation(meta);
-            String activeImpl = implFactory.newExtension(meta, t.metaId);
-
             saveClass(classesFile, meta.className, representation);
-            saveClass(classesFile, implFactory.extensionName(meta.className), activeImpl);
+
+            if (configuration.generateActiveRecords) {
+                System.out.println("...its ActiveRecord");
+                String activeImpl = implFactory.newExtension(meta, t.metaId);
+                saveClass(classesFile, implFactory.extensionName(meta.className), activeImpl);
+            }
         }
     }
 

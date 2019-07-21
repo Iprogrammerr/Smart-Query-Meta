@@ -6,24 +6,27 @@ import java.util.Properties;
 
 public class Configuration {
 
-    private static final String DATABASE_USER = "database.user";
-    private static final String DATABASE_PASSWORD = "database.password";
-    private static final String JDBC_URL = "jdbc.url";
-    private static final String CLASSES_PACKAGE = "classes.package";
-    private static final String CLASSES_PATH = "classes.path";
+    private static final String DATABASE_USER = "databaseUser";
+    private static final String DATABASE_PASSWORD = "databasePassword";
+    private static final String JDBC_URL = "jdbcUrl";
+    private static final String CLASSES_PACKAGE = "classesPackage";
+    private static final String CLASSES_PATH = "classesPath";
+    private static final String GENERATE_ACTIVE_RECORDS = "generateActiveRecords";
     public final String jdbcUrl;
     public final String databaseUser;
     public final String databasePassword;
     public final String classesPackage;
     public final String classesPath;
+    public final boolean generateActiveRecords;
 
     public Configuration(String jdbcUrl, String databaseUser, String databasePassword, String classesPackage,
-        String classesPath) {
+        String classesPath, boolean generateActiveRecords) {
         this.jdbcUrl = notNull(JDBC_URL, jdbcUrl);
         this.databaseUser = notNull(DATABASE_USER, databaseUser);
         this.databasePassword = notNull(DATABASE_PASSWORD, databasePassword);
         this.classesPackage = notNull(CLASSES_PACKAGE, classesPackage);
         this.classesPath = notNull(CLASSES_PATH, classesPath);
+        this.generateActiveRecords = generateActiveRecords;
     }
 
     private static String notNull(String key, String value) {
@@ -36,7 +39,7 @@ public class Configuration {
     public static Configuration fromProperties(Properties properties) {
         return new Configuration(properties.getProperty(JDBC_URL), properties.getProperty(DATABASE_USER),
             properties.getProperty(DATABASE_PASSWORD), properties.getProperty(CLASSES_PACKAGE),
-            properties.getProperty(CLASSES_PATH));
+            properties.getProperty(CLASSES_PATH), Boolean.valueOf(properties.getProperty(GENERATE_ACTIVE_RECORDS)));
     }
 
     public static Configuration fromCmd(String... args) {
@@ -48,16 +51,5 @@ public class Configuration {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Configuration{" +
-            "jdbcUrl='" + jdbcUrl + '\'' +
-            ", databaseUser='" + databaseUser + '\'' +
-            ", databasePassword='" + databasePassword + '\'' +
-            ", classesPackage='" + classesPackage + '\'' +
-            ", classesPath='" + classesPath + '\'' +
-            '}';
     }
 }
