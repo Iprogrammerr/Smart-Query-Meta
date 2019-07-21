@@ -45,7 +45,7 @@ public class App {
             String activeImpl = implFactory.newExtension(meta, t.metaId);
 
             saveClass(classesFile, meta.className, representation);
-            saveClass(classesFile, implFactory.implName(meta.className), activeImpl);
+            saveClass(classesFile, implFactory.extensionName(meta.className), activeImpl);
         }
     }
 

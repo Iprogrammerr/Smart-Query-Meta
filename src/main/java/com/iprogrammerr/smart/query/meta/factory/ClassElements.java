@@ -1,7 +1,6 @@
 package com.iprogrammerr.smart.query.meta.factory;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ClassElements {
 
@@ -24,21 +23,21 @@ public class ClassElements {
     public static final String FACTORY_NAME = "fromResult";
     public static final String CASED_SEPARATOR = "_";
 
-    public static String capitalized(String string) {
+    public static String capitalized(String element) {
         StringBuilder builder = new StringBuilder();
-        builder.append(Character.toUpperCase(string.charAt(0)));
-        if (string.length() > 1) {
-            builder.append(string.substring(1));
+        builder.append(Character.toUpperCase(element.charAt(0)));
+        if (element.length() > 1) {
+            builder.append(element.substring(1));
         }
         return builder.toString();
     }
 
-    public static String toCamelCase(String string) {
-        return toCase(string, CASED_SEPARATOR, false);
+    public static String toCamelCase(String element) {
+        return toCase(element, CASED_SEPARATOR, false);
     }
 
-    public static String toPascalCase(String string) {
-        return toCase(string, CASED_SEPARATOR, true);
+    public static String toPascalCase(String element) {
+        return toCase(element, CASED_SEPARATOR, true);
     }
 
     public static String toCase(String string, String separator, boolean pascalCase) {
@@ -56,7 +55,7 @@ public class ClassElements {
         return builder.toString();
     }
 
-    public static String classProlog(String packageName, List<String> imports) {
+    public static String prolog(String packageName, List<String> imports) {
         StringBuilder builder = new StringBuilder()
             .append(PACKAGE_PREFIX).append(" ").append(packageName)
             .append(SEMICOLON);
@@ -69,7 +68,7 @@ public class ClassElements {
         return builder.toString();
     }
 
-    public static String argsInLines(int firstLineOffset, List<String> args, int lineMaxLength) {
+    public static String argsInLines(int firstLineOffset, List<String> args, int lineMaxLength, int lineTabs) {
         StringBuilder builder = new StringBuilder();
         builder.append(args.get(0));
         int previousLineLength = 0;
@@ -80,7 +79,10 @@ public class ClassElements {
             if (newLine) {
                 previousLineLength = builder.length();
                 firstLineOffset = 0;
-                builder.append(NEW_LINE).append(DOUBLE_TAB);
+                builder.append(NEW_LINE);
+                for (int j = 0; j < lineTabs; j++) {
+                    builder.append(TAB);
+                }
             }
             builder.append(arg);
 
@@ -89,14 +91,6 @@ public class ClassElements {
     }
 
     public static String argsInLines(int firstLineOffset, List<String> args) {
-        return argsInLines(firstLineOffset, args, MAX_LINE_LENGTH);
-    }
-
-    public static String argsInLines(List<String> args) {
-        return argsInLines(0, args);
-    }
-
-    public static List<String> constants(List<String> strings) {
-        return strings.stream().map(String::toUpperCase).collect(Collectors.toList());
+        return argsInLines(firstLineOffset, args, MAX_LINE_LENGTH, 2);
     }
 }

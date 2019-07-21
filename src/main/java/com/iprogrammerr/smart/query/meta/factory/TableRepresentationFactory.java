@@ -53,6 +53,10 @@ public class TableRepresentationFactory {
         this.packageName = packageName;
     }
 
+    public static List<String> toUpperCase(List<String> labels) {
+        return labels.stream().map(String::toUpperCase).collect(Collectors.toList());
+    }
+
     public String newRepresentation(MetaData data) {
         return new StringBuilder()
             .append(header(data.className, data.fieldsTypes.values().contains(BLOB)))
@@ -75,7 +79,7 @@ public class TableRepresentationFactory {
             imports = IMPORTS;
         }
         return new StringBuilder()
-            .append(ClassElements.classProlog(packageName, imports))
+            .append(ClassElements.prolog(packageName, imports))
             .append(ClassElements.EMPTY_LINE)
             .append(CLASS_PREFIX).append(" ")
             .append(className).append(" ").append(ClassElements.START_CURLY_BRACKET)
@@ -228,9 +232,8 @@ public class TableRepresentationFactory {
     }
 
     private String constantsFactoryInvocation(List<String> columnsLabels) {
-        return factoryInvocation(false, RESULT_SET_ARG_NAME, ClassElements.constants(columnsLabels));
+        return factoryInvocation(false, RESULT_SET_ARG_NAME, toUpperCase(columnsLabels));
     }
-
 
     private String factoryInvocation(boolean list, String arg, List<String> args) {
         StringBuilder builder = new StringBuilder()
@@ -264,7 +267,7 @@ public class TableRepresentationFactory {
             .append(ClassElements.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
             .append(" ").append(ClassElements.START_CURLY_BRACKET).append(ClassElements.NEW_LINE)
             .append(ClassElements.DOUBLE_TAB).append("return ")
-            .append(factoryInvocation(true, RESULT_SET_ARG_NAME, ClassElements.constants(data.columnsLabels)))
+            .append(factoryInvocation(true, RESULT_SET_ARG_NAME, toUpperCase(data.columnsLabels)))
             .append(ClassElements.SEMICOLON)
             .append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.END_CURLY_BRACKET)
             .toString();
