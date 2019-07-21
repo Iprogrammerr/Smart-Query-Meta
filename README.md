@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/Iprogrammerr/Smart-Query-Meta.svg?branch=master)](https://travis-ci.com/Iprogrammerr/Smart-Query-Meta)
+[![Test Coverage](https://img.shields.io/codecov/c/github/iprogrammerr/smart-query-meta/master.svg)](https://codecov.io/gh/Iprogrammerr/Smart-Query-Meta/branch/master)
 # Smart Query Meta
 SQL tables representation generator based on database connection.
 ## Usage
