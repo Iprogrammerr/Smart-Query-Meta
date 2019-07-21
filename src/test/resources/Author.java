@@ -13,13 +13,13 @@ public class Author {
 	public static final String ALIAS = "alias";
 	public static final String ALIVE = "alive";
 
-	public final int id;
+	public final Integer id;
 	public final String name;
 	public final String surname;
 	public final String alias;
-	public final int alive;
+	public final Byte alive;
 
-	public Author(int id, String name, String surname, String alias, int alive) {
+	public Author(Integer id, String name, String surname, String alias, Byte alive) {
 		this.id = id;
 		this.name = name;
 		this.surname = surname;
@@ -29,11 +29,11 @@ public class Author {
 
 	public static Author fromResult(ResultSet result, String idLabel, String nameLabel, String surnameLabel, 
 		String aliasLabel, String aliveLabel) throws Exception {
-		int id = result.getInt(idLabel);
+		Integer id = result.getInt(idLabel);
 		String name = result.getString(nameLabel);
 		String surname = result.getString(surnameLabel);
 		String alias = result.getString(aliasLabel);
-		int alive = result.getInt(aliveLabel);
+		Byte alive = result.getByte(aliveLabel);
 		return new Author(id, name, surname, alias, alive);
 	}
 

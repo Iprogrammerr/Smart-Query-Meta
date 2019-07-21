@@ -16,14 +16,7 @@ public class MetaTable {
     private static final String CLASS_PARTS_SEPARATOR = ".";
 
     static {
-        TYPES_MAPPING.put("Boolean", "boolean");
-        TYPES_MAPPING.put("Byte", "int");
-        TYPES_MAPPING.put("Short", "int");
-        TYPES_MAPPING.put("Integer", "int");
-        TYPES_MAPPING.put("Long", "long");
-        TYPES_MAPPING.put("BigInteger", "long");
-        TYPES_MAPPING.put("Float", "float");
-        TYPES_MAPPING.put("Double", "double");
+        TYPES_MAPPING.put("BigInteger", "Long");
     }
 
     private final QueryFactory factory;

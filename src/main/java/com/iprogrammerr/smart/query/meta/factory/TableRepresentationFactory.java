@@ -4,6 +4,7 @@ import com.iprogrammerr.smart.query.meta.data.MetaData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +29,12 @@ public class TableRepresentationFactory {
     private static final String FACTORY_ARG_SUFFIX = "Label";
     private static final String LIST_NAME = "list";
     private static final String INITIALIZED_LIST = "new ArrayList<>();";
+    private static final Map<String, String> TYPE_RESULT_SET_TYPE = new HashMap<>();
+
+    static {
+        TYPE_RESULT_SET_TYPE.put("Integer", "int");
+    }
+
     private final String packageName;
 
     public TableRepresentationFactory(String packageName) {
@@ -254,15 +261,11 @@ public class TableRepresentationFactory {
     private String resultSetInvocation(String type, String key) {
         return new StringBuilder()
             .append(RESULT_SET_ARG_NAME).append(Strings.DOT).append("get")
-            .append(capitalized(type))
+            .append(Strings.capitalized(TYPE_RESULT_SET_TYPE.getOrDefault(type, type)))
             .append(Strings.START_BRACKET)
             .append(key)
             .append(Strings.END_BRACKET)
             .toString();
-    }
-
-    private String capitalized(String string) {
-        return Character.toUpperCase(string.charAt(0)) + string.substring(1);
     }
 
     private String fieldInitialization(String field, String value) {

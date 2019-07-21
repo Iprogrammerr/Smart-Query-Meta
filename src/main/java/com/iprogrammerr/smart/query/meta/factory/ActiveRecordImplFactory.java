@@ -4,7 +4,6 @@ import com.iprogrammerr.smart.query.meta.data.IdInfo;
 import com.iprogrammerr.smart.query.meta.data.MetaData;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,15 +20,6 @@ public class ActiveRecordImplFactory {
     private static final String PUBLIC = "public";
     private static final String ID = "id";
     private static final String PARENT_FETCH = "fetchQuery()";
-    private static final Map<String, String> ID_TYPE_TRANSLATION = new HashMap<>();
-
-    static {
-        ID_TYPE_TRANSLATION.put("byte", "Integer");
-        ID_TYPE_TRANSLATION.put("short", "Integer");
-        ID_TYPE_TRANSLATION.put("int", "Integer");
-        ID_TYPE_TRANSLATION.put("long", "Long");
-    }
-
     private final String packageName;
 
     public ActiveRecordImplFactory(String packageName) {
@@ -60,7 +50,7 @@ public class ActiveRecordImplFactory {
         if (!idType.isPresent()) {
             throw new RuntimeException(String.format("Can't find id %s in %s", idName, meta.fieldsTypes));
         }
-        return ID_TYPE_TRANSLATION.getOrDefault(idType.get(), idType.get());
+        return idType.get();
     }
 
     private String prolog() {
