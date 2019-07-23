@@ -1,5 +1,7 @@
 package com.iprogrammerr.smart.query.meta.data;
 
+import java.util.Objects;
+
 public class MetaId {
 
     public final String name;
@@ -11,17 +13,16 @@ public class MetaId {
     }
 
     @Override
-    public boolean equals(Object object) {
-        boolean equal;
-        if (object == this) {
-            equal = true;
-        } else if (object != null && object.getClass().equals(getClass())) {
-            MetaId other = (MetaId) object;
-            equal = name.equals(other.name) && autoIncrement == other.autoIncrement;
-        } else {
-            equal = false;
-        }
-        return equal;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MetaId metaId = (MetaId) o;
+        return autoIncrement == metaId.autoIncrement &&
+            Objects.equals(name, metaId.name);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, autoIncrement);
     }
 }

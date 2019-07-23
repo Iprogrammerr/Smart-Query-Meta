@@ -45,7 +45,7 @@ public class Tables {
 
     private boolean hasAutoIncrementId(String table, String idColumn) {
         return new SmartQuery(connection, false).dsl()
-            .select(idColumn).from(table).where(idColumn)
+            .select(idColumn).from(table).limit(1)
             .query()
             .fetch(r -> r.getMetaData().isAutoIncrement(1));
     }
