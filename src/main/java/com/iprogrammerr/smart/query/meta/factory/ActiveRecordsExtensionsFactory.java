@@ -65,7 +65,7 @@ public class ActiveRecordsExtensionsFactory {
     }
 
     private String constant(String className, String key) {
-        return className + "." + key;
+        return className + "." + key.toUpperCase();
     }
 
     private String constructors(MetaData meta, MetaId metaId, String idType) {

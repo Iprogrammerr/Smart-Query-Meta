@@ -23,6 +23,6 @@ CREATE TABLE book (
 DROP TABLE IF EXISTS organism;
 CREATE TABLE organism (
 	dna VARCHAR(255) NOT NULL,
-	name VARCHAR(100) NOT NULL,
+	name VARCHAR(100),
 	PRIMARY KEY (dna)
 );

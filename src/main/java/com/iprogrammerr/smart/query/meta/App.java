@@ -25,7 +25,8 @@ public class App {
 
         QueryFactory queryFactory = new SmartQueryFactory(database::connection, false);
         TablesRepresentationsFactory tablesFactory = new TablesRepresentationsFactory(configuration.classesPackage);
-        ActiveRecordsExtensionsFactory recordsFactory = new ActiveRecordsExtensionsFactory(configuration.classesPackage);
+        ActiveRecordsExtensionsFactory recordsFactory = new ActiveRecordsExtensionsFactory(
+            configuration.classesPackage);
         List<Table> tables = new Tables(database.connection()).all();
 
         File classesFile = new File(configuration.classesPath);
@@ -34,7 +35,7 @@ public class App {
                 configuration.classesPath));
         }
 
-        System.out.println(String.format("Generating %s db representations...",
+        System.out.println(String.format("Generating %s db representation...",
             database.connection().getCatalog()));
         for (Table t : tables) {
             MetaData meta = new MetaTable(queryFactory, t.name).data();
