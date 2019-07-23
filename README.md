@@ -20,7 +20,7 @@ classesPath=/home/user/projects/project/target/generated/sources
 generateActiveRecords=true
 ```
 ### Plugin
-```
+```xml
 <plugin>
     <groupId>com.iprogrammerr</groupId>
     <artifactId>smart-query-meta</artifactId>
