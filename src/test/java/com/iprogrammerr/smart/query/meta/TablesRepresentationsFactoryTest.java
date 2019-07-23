@@ -4,7 +4,7 @@ import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.SmartQueryFactory;
 import com.iprogrammerr.smart.query.meta.data.MetaTable;
 import com.iprogrammerr.smart.query.meta.data.Tables;
-import com.iprogrammerr.smart.query.meta.factory.TableRepresentationFactory;
+import com.iprogrammerr.smart.query.meta.factory.TablesRepresentationsFactory;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -13,18 +13,18 @@ import org.junit.Test;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TableRepresentationFactoryTest {
+public class TablesRepresentationsFactoryTest {
 
     private Database database;
     private QueryFactory queryFactory;
-    private TableRepresentationFactory factory;
+    private TablesRepresentationsFactory factory;
 
     @Before
     public void setup() throws Exception {
         Configuration configuration = Configuration.fromCmd();
         database = new Database(configuration.jdbcUrl, configuration.databaseUser, configuration.databasePassword);
         queryFactory = new SmartQueryFactory(database::connection, false);
-        factory = new TableRepresentationFactory(configuration.classesPackage);
+        factory = new TablesRepresentationsFactory(configuration.classesPackage);
         database.setup();
     }
 

@@ -9,4 +9,19 @@ public class MetaId {
         this.name = name;
         this.autoIncrement = autoIncrement;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        boolean equal;
+        if (object == this) {
+            equal = true;
+        } else if (object != null && object.getClass().equals(getClass())) {
+            MetaId other = (MetaId) object;
+            equal = name.equals(other.name) && autoIncrement == other.autoIncrement;
+        } else {
+            equal = false;
+        }
+        return equal;
+
+    }
 }

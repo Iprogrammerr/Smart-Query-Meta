@@ -184,13 +184,13 @@ public class AuthorRecord extends ActiveRecord<Integer, Author> {
     }
     
     public AuthorRecord setName(String name) {
-    	set(Author.NAME, name);
-	    return this; 
+        set(Author.NAME, name);
+        return this; 
     }
     
-    public AuthorRecord setSurname(String surname) {
-	    set(Author.SURNAME, surname);
-	    return this; 
+    public AuthorRecord setSurname(String surname) { 
+        set(Author.SURNAME, surname);
+        return this; 
     }
 
     public AuthorRecord setAlias(String alias) { 

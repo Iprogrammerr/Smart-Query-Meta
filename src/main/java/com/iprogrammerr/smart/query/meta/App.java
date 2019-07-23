@@ -6,8 +6,8 @@ import com.iprogrammerr.smart.query.meta.data.MetaData;
 import com.iprogrammerr.smart.query.meta.data.MetaTable;
 import com.iprogrammerr.smart.query.meta.data.Table;
 import com.iprogrammerr.smart.query.meta.data.Tables;
-import com.iprogrammerr.smart.query.meta.factory.ActiveRecordExtensionFactory;
-import com.iprogrammerr.smart.query.meta.factory.TableRepresentationFactory;
+import com.iprogrammerr.smart.query.meta.factory.ActiveRecordsExtensionsFactory;
+import com.iprogrammerr.smart.query.meta.factory.TablesRepresentationsFactory;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -24,8 +24,8 @@ public class App {
             configuration.databasePassword);
 
         QueryFactory queryFactory = new SmartQueryFactory(database::connection, false);
-        TableRepresentationFactory tablesFactory = new TableRepresentationFactory(configuration.classesPackage);
-        ActiveRecordExtensionFactory implFactory = new ActiveRecordExtensionFactory(configuration.classesPackage);
+        TablesRepresentationsFactory tablesFactory = new TablesRepresentationsFactory(configuration.classesPackage);
+        ActiveRecordsExtensionsFactory recordsFactory = new ActiveRecordsExtensionsFactory(configuration.classesPackage);
         List<Table> tables = new Tables(database.connection()).all();
 
         File classesFile = new File(configuration.classesPath);
@@ -45,8 +45,8 @@ public class App {
 
             if (configuration.generateActiveRecords) {
                 System.out.println("...its ActiveRecord");
-                String activeImpl = implFactory.newExtension(meta, t.metaId);
-                saveClass(classesFile, implFactory.extensionName(meta.className), activeImpl);
+                String activeImpl = recordsFactory.newExtension(meta, t.metaId);
+                saveClass(classesFile, recordsFactory.extensionName(meta.className), activeImpl);
             }
         }
     }

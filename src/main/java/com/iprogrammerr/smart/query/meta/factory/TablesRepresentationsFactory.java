@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TableRepresentationFactory {
+public class TablesRepresentationsFactory {
 
     private static final List<String> IMPORTS = Arrays.asList("import java.sql.ResultSet;",
         "import java.util.ArrayList;", "import java.util.List;");
@@ -49,7 +49,7 @@ public class TableRepresentationFactory {
 
     private final String packageName;
 
-    public TableRepresentationFactory(String packageName) {
+    public TablesRepresentationsFactory(String packageName) {
         this.packageName = packageName;
     }
 

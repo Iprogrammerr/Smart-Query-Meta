@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ActiveRecordExtensionFactory {
+public class ActiveRecordsExtensionsFactory {
 
     private static final int SUPER_CALL_LINE_MAX_LENGTH = 110;
     private static final int NEXT_LINE_SUPER_CALL_TABS = 3;
@@ -22,7 +22,7 @@ public class ActiveRecordExtensionFactory {
     private static final String PARENT_FETCH = "fetchQuery()";
     private final String packageName;
 
-    public ActiveRecordExtensionFactory(String packageName) {
+    public ActiveRecordsExtensionsFactory(String packageName) {
         this.packageName = packageName;
     }
 
