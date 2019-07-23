@@ -3,6 +3,7 @@
 # Smart Query Meta
 SQL tables representation and ActiveRecord extensions generator based on database connection.
 ## Usage
+### Jar
 ```
 mvn clean install
 java -jar target/smart-query-meta-jar-with-dependecies.jar <path to application.properties>
@@ -17,6 +18,30 @@ classesPackage=com.iprogrammerr.smart.query.meta.table
 classesPath=/home/user/projects/project/target/generated/sources
 #whether to generate child classes of com.iprogrammerr.smart.query.active.ActiveRecord
 generateActiveRecords=true
+```
+### Plugin
+```
+<plugin>
+    <groupId>com.iprogrammerr</groupId>
+    <artifactId>smart-query-meta</artifactId>
+    <version>1.0.0</version>
+    <configuration>
+        <jdbcUrl>jdbc:mysql://localhost:3306/database</jdbcUrl>
+        <databaseUser>root</databaseUser>
+        <databasePassword>abc</databasePassword>
+        <classesPackage>com.iprogrammerr.db</classesPackage>
+        <classesPath>/home/user/projects/project/target/generated/sources</classesPath>
+        <generateActiveRecords>true</generateActiveRecords>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>compile</phase>
+            <goals>
+                <goal>generate</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
 ```
 ## Example
 Schema:
