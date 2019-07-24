@@ -45,10 +45,11 @@ public class ActiveRecordsExtensionsFactory {
     }
 
     private String idType(MetaData meta, String idName) {
+        String idField = ClassElements.toCamelCase(idName);
         Optional<String> idType = meta.fieldsTypes.entrySet().stream()
-            .filter(e -> e.getKey().equalsIgnoreCase(idName)).map(Map.Entry::getValue).findFirst();
+            .filter(e -> e.getKey().equalsIgnoreCase(idField)).map(Map.Entry::getValue).findFirst();
         if (!idType.isPresent()) {
-            throw new RuntimeException(String.format("Can't find id %s in %s", idName, meta.fieldsTypes));
+            throw new RuntimeException(String.format("Can't find id %s in %s", idField, meta.fieldsTypes));
         }
         return idType.get();
     }
