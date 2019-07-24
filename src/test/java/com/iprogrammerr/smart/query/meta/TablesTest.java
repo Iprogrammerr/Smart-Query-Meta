@@ -25,9 +25,9 @@ public class TablesTest {
     public void readsTables() throws Exception {
         Tables tables = new Tables(database.connection());
         Table[] expected = {
-            new Table("AUTHOR", new MetaId("ID", true)),
-            new Table("BOOK", new MetaId("ID", true)),
-            new Table("ORGANISM", new MetaId("DNA", false))
+            new Table("AUTHOR", new MetaId("ID", true, false)),
+            new Table("BOOK", new MetaId("ID", true, false)),
+            new Table("ORGANISM", new MetaId("DNA", false, false))
         };
         List<Table> actual = tables.all();
         MatcherAssert.assertThat(actual, Matchers.contains(expected));

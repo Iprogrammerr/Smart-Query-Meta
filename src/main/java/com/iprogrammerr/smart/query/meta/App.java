@@ -41,11 +41,16 @@ public class App {
             MetaData meta = new MetaTable(queryFactory, t.name).data();
 
             System.out.println(String.format("Table: %s", t.name));
-            System.out.println(String.format("Id = %s, %b", t.metaId.name, t.metaId.autoIncrement));
             String representation = tablesFactory.newRepresentation(meta);
             saveClass(classesFile, meta.className, representation);
 
-            if (configuration.generateActiveRecords) {
+            if (!configuration.generateActiveRecords) {
+                continue;
+            }
+
+            if (t.metaId.composite) {
+                System.out.println("...compositeId, ActiveRecord not supported");
+            } else {
                 System.out.println("...its ActiveRecord");
                 String activeImpl = recordsFactory.newExtension(meta, t.metaId);
                 saveClass(classesFile, recordsFactory.extensionName(meta.className), activeImpl);

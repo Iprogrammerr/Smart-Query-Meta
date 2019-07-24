@@ -24,7 +24,7 @@ generateActiveRecords=true
 <plugin>
     <groupId>com.iprogrammerr</groupId>
     <artifactId>smart-query-meta</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <configuration>
         <jdbcUrl>jdbc:mysql://localhost:3306/database</jdbcUrl>
         <databaseUser>root</databaseUser>
