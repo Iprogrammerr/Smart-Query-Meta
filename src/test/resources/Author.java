@@ -1,8 +1,6 @@
 package com.iprogrammerr.smart.query.meta.table;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Author {
 
@@ -39,18 +37,5 @@ public class Author {
 
 	public static Author fromResult(ResultSet result) throws Exception {
 		return fromResult(result, ID, NAME, SURNAME, ALIAS, ALIVE);
-	}
-
-	public static List<Author> listFromResult(ResultSet result, String idLabel, String nameLabel, String surnameLabel, 
-		String aliasLabel, String aliveLabel) throws Exception {
-		List<Author> list = new ArrayList<>();
-		do {
-			list.add(fromResult(result, idLabel, nameLabel, surnameLabel, aliasLabel, aliveLabel));
-		} while (result.next());
-		return list;
-	}
-
-	public static List<Author> listFromResult(ResultSet result) throws Exception {
-		return listFromResult(result, ID, NAME, SURNAME, ALIAS, ALIVE);
 	}
 }
