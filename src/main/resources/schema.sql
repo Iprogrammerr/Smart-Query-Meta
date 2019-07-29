@@ -21,7 +21,7 @@ CREATE TABLE book (
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	name VARCHAR(100) unique,
+	full_name VARCHAR(100) unique,
 	PRIMARY KEY (id)
 );
 

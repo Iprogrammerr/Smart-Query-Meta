@@ -9,7 +9,8 @@ public class ClassElements {
     public static final String PACKAGE_PREFIX = "package";
     public static final String START_CURLY_BRACKET = "{";
     public static final String END_CURLY_BRACKET = "}";
-    public static final String TAB = "\t";
+    public static final String SPACE = " ";
+    public static final String TAB = SPACE + SPACE + SPACE + SPACE;
     public static final String DOUBLE_TAB = TAB + TAB;
     public static final String NEW_LINE = "\n";
     public static final String EMPTY_LINE = NEW_LINE + NEW_LINE;
@@ -20,7 +21,6 @@ public class ClassElements {
     public static final String COMMA = ",";
     public static final String DOT = ".";
     public static final String THIS = "this";
-    public static final String FACTORY_NAME = "fromResult";
     public static final String CASED_SEPARATOR = "_";
 
     public static String capitalized(String element) {
@@ -55,14 +55,16 @@ public class ClassElements {
         return builder.toString();
     }
 
-    public static String prolog(String packageName, List<String> imports) {
+    public static String prolog(String packageName, List<List<String>> importsGroups) {
         StringBuilder builder = new StringBuilder()
             .append(PACKAGE_PREFIX).append(" ").append(packageName)
             .append(SEMICOLON);
-        if (!imports.isEmpty()) {
-            builder.append(NEW_LINE);
-            for (String i : imports) {
-                builder.append(NEW_LINE).append(i);
+        if (!importsGroups.isEmpty()) {
+            for (List<String> g : importsGroups) {
+                builder.append(NEW_LINE);
+                for (String i : g) {
+                    builder.append(NEW_LINE).append(i);
+                }
             }
         }
         return builder.toString();
@@ -73,9 +75,10 @@ public class ClassElements {
         builder.append(args.get(0));
         int previousLineLength = 0;
         for (int i = 1; i < args.size(); i++) {
-            builder.append(COMMA).append(" ");
+            builder.append(COMMA);
             String arg = args.get(i);
-            boolean newLine = (firstLineOffset + builder.length() + arg.length() - previousLineLength) > lineMaxLength;
+            boolean newLine = (firstLineOffset + builder.length() + arg
+                .length() - previousLineLength) > lineMaxLength;
             if (newLine) {
                 previousLineLength = builder.length();
                 firstLineOffset = 0;
@@ -83,6 +86,8 @@ public class ClassElements {
                 for (int j = 0; j < lineTabs; j++) {
                     builder.append(TAB);
                 }
+            } else {
+                builder.append(" ");
             }
             builder.append(arg);
 

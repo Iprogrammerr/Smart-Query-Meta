@@ -3,45 +3,21 @@ package com.iprogrammerr.smart.query.meta.factory;
 import com.iprogrammerr.smart.query.meta.data.MetaData;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TablesRepresentationsFactory {
 
-    private static final List<String> IMPORTS = Arrays.asList("import java.sql.ResultSet;");
     private static final String BLOB_IMPORT = "import java.sql.Blob;";
+    private static final String MAPPING_IMPORT = "import com.iprogrammerr.smart.query.mapping.clazz.Mapping;";
     private static final String BLOB = "Blob";
     private static final String CONSTANTS_MODIFIED = "public static final";
     private static final String CLASS_PREFIX = "public class";
     private static final String FIELD_MODIFIER = "public final";
     private static final String STRING = "String";
     private static final String SPACED_EQUAL = " = ";
-    private static final String FACTORIES_MODIFIER = "public static";
-    private static final String LIST_FACTORY_NAME = "listFromResult";
-    private static final String RESULT_SET = "ResultSet";
-    private static final String RESULT_SET_ARG_NAME = "result";
-    private static final String RESULT_SET_ARG = RESULT_SET + " " + RESULT_SET_ARG_NAME;
-    private static final String THROWS_EXCEPTION = "throws Exception";
-    private static final String FACTORY_ARG_SUFFIX = "Label";
-    private static final Map<String, String> TYPE_RESULT_SET_TYPE = new HashMap<>();
-    private static final Set<String> WAS_NULL_TYPES = new HashSet<>();
-
-    static {
-        TYPE_RESULT_SET_TYPE.put("Integer", "int");
-        WAS_NULL_TYPES.add("Double");
-        WAS_NULL_TYPES.add("Float");
-        WAS_NULL_TYPES.add("Long");
-        WAS_NULL_TYPES.add("Integer");
-        WAS_NULL_TYPES.add("Short");
-        WAS_NULL_TYPES.add("Character");
-        WAS_NULL_TYPES.add("Byte");
-        WAS_NULL_TYPES.add("Boolean");
-    }
 
     private final String packageName;
 
@@ -49,33 +25,44 @@ public class TablesRepresentationsFactory {
         this.packageName = packageName;
     }
 
-    public static List<String> toUpperCase(List<String> labels) {
-        return labels.stream().map(String::toUpperCase).collect(Collectors.toList());
-    }
-
     public String newRepresentation(MetaData data) {
         return new StringBuilder()
-            .append(header(data.className, data.fieldsTypes.values().contains(BLOB)))
+            .append(header(data.className, data.fieldsTypes.values().contains(BLOB), needsMapping(data)))
             .append(ClassElements.EMPTY_LINE)
             .append(fields(data))
             .append(ClassElements.EMPTY_LINE)
             .append(constructor(data.className, data.fieldsTypes))
-            .append(ClassElements.EMPTY_LINE)
-            .append(factories(data))
             .append(ClassElements.NEW_LINE).append(ClassElements.END_CURLY_BRACKET)
             .toString();
     }
 
-    private String header(String className, boolean hasBlob) {
-        List<String> imports;
+    private boolean needsMapping(MetaData data) {
+        boolean needsMapping = false;
+        int i = 0;
+        for (String f : data.fieldsTypes.keySet()) {
+            if (!isFieldEqualToColumnLabel(f, data.columnsLabels.get(i))) {
+                needsMapping = true;
+                break;
+            }
+            i++;
+        }
+        return needsMapping;
+    }
+
+    private boolean isFieldEqualToColumnLabel(String field, String label) {
+        return field.equalsIgnoreCase(label);
+    }
+
+    private String header(String className, boolean hasBlob, boolean needsMapping) {
+        List<List<String>> importsGroups = new ArrayList<>();
+        if (needsMapping) {
+            importsGroups.add(Collections.singletonList(MAPPING_IMPORT));
+        }
         if (hasBlob) {
-            imports = new ArrayList<>(IMPORTS);
-            imports.add(BLOB_IMPORT);
-        } else {
-            imports = IMPORTS;
+            importsGroups.add(Collections.singletonList(BLOB_IMPORT));
         }
         return new StringBuilder()
-            .append(ClassElements.prolog(packageName, imports))
+            .append(ClassElements.prolog(packageName, importsGroups))
             .append(ClassElements.EMPTY_LINE)
             .append(CLASS_PREFIX).append(" ")
             .append(className).append(" ").append(ClassElements.START_CURLY_BRACKET)
@@ -84,16 +71,27 @@ public class TablesRepresentationsFactory {
 
     private String fields(MetaData data) {
         StringBuilder builder = new StringBuilder();
-        builder.append(constant(ClassElements.TABLE, data.tableName));
+        builder.append(constant(ClassElements.TABLE, data.tableName.toLowerCase()));
         for (String l : data.columnsLabels) {
             builder.append(ClassElements.NEW_LINE).append(constant(l.toUpperCase(), l.toLowerCase()));
         }
+        int i = 0;
         builder.append(ClassElements.NEW_LINE);
         for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
+            String l = data.columnsLabels.get(i);
+            if (!isFieldEqualToColumnLabel(e.getKey(), l)) {
+                builder.append(ClassElements.NEW_LINE).append(ClassElements.TAB)
+                    .append(mappingAnnotation(l));
+            }
+            i++;
             builder.append(ClassElements.NEW_LINE).append(ClassElements.TAB)
                 .append(field(e.getValue(), e.getKey()));
         }
         return builder.toString();
+    }
+
+    private String mappingAnnotation(String label) {
+        return String.format("@Mapping(%s)", label);
     }
 
     private String constant(String name, String value) {
@@ -127,122 +125,6 @@ public class TablesRepresentationsFactory {
                 .append(ClassElements.SEMICOLON);
         }
         return builder.append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.END_CURLY_BRACKET)
-            .toString();
-    }
-
-    private String factories(MetaData data) {
-        return new StringBuilder()
-            .append(singleAliasedFactory(data))
-            .append(ClassElements.EMPTY_LINE)
-            .append(singleFactory(data))
-            .toString();
-    }
-
-    private String singleAliasedFactory(MetaData data) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(factoryPrefix(data.className))
-            .append(aliasedFactoryArgs(builder.length(), data.fieldsTypes))
-            .append(ClassElements.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
-            .append(" ").append(ClassElements.START_CURLY_BRACKET)
-            .append(ClassElements.NEW_LINE)
-            .append(aliasedFactoryBody(data));
-        int offset = builder.length();
-        List<String> fields = new ArrayList<>(data.fieldsTypes.keySet());
-        return builder.append(ClassElements.DOUBLE_TAB).append("return new ").append(data.className)
-            .append(ClassElements.START_BRACKET)
-            .append(ClassElements.argsInLines(builder.length() - offset, fields))
-            .append(ClassElements.END_BRACKET).append(ClassElements.SEMICOLON)
-            .append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.END_CURLY_BRACKET)
-            .toString();
-    }
-
-    private String aliasedFactoryBody(MetaData data) {
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, String> e : data.fieldsTypes.entrySet()) {
-            String field = e.getKey();
-            String type = e.getValue();
-            builder.append(fieldInitialization(type + " " + field,
-                resultSetInvocation(e.getValue(), aliased(field))))
-                .append(ClassElements.NEW_LINE);
-            if (WAS_NULL_TYPES.contains(type) && data.nullableFields.contains(field)) {
-                builder.append(wasNull(field))
-                    .append(ClassElements.NEW_LINE);
-            }
-        }
-        return builder.toString();
-    }
-
-    private String aliasedFactoryArgs(int firstLineOffset, Map<String, String> fieldsTypes) {
-        List<String> args = new ArrayList<>();
-        args.add(RESULT_SET_ARG);
-        List<String> aliasedArgs = fieldsTypes.keySet().stream().map(f -> STRING + " " + aliased(f))
-            .collect(Collectors.toList());
-        args.addAll(aliasedArgs);
-        return ClassElements.argsInLines(firstLineOffset, args);
-    }
-
-    private String wasNull(String field) {
-        return new StringBuilder()
-            .append(ClassElements.DOUBLE_TAB).append("if(").append(RESULT_SET_ARG_NAME).append(".wasNull()) ")
-            .append(ClassElements.START_CURLY_BRACKET).append(ClassElements.NEW_LINE)
-            .append(ClassElements.DOUBLE_TAB).append(ClassElements.TAB)
-            .append(field).append(SPACED_EQUAL).append("null;")
-            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB)
-            .append(ClassElements.END_CURLY_BRACKET)
-            .toString();
-    }
-
-    private String factoryPrefix(String className) {
-        return new StringBuilder()
-            .append(ClassElements.TAB)
-            .append(FACTORIES_MODIFIER).append(" ")
-            .append(className).append(" ").append(ClassElements.FACTORY_NAME)
-            .append(ClassElements.START_BRACKET).toString();
-    }
-
-    private String singleFactory(MetaData data) {
-        return new StringBuilder()
-            .append(factoryPrefix(data.className))
-            .append(RESULT_SET_ARG).append(ClassElements.END_BRACKET).append(" ").append(THROWS_EXCEPTION)
-            .append(" ").append(ClassElements.START_CURLY_BRACKET).append(ClassElements.NEW_LINE)
-            .append(ClassElements.DOUBLE_TAB).append("return ")
-            .append(constantsFactoryInvocation(data.columnsLabels))
-            .append(ClassElements.SEMICOLON).append(ClassElements.NEW_LINE).append(ClassElements.TAB)
-            .append(ClassElements.END_CURLY_BRACKET)
-            .toString();
-    }
-
-    private String constantsFactoryInvocation(List<String> columnsLabels) {
-        return factoryInvocation(false, RESULT_SET_ARG_NAME, toUpperCase(columnsLabels));
-    }
-
-    private String factoryInvocation(boolean list, String arg, List<String> args) {
-        StringBuilder builder = new StringBuilder()
-            .append(list ? LIST_FACTORY_NAME : ClassElements.FACTORY_NAME).append(ClassElements.START_BRACKET)
-            .append(arg);
-        for (String a : args) {
-            builder.append(ClassElements.COMMA).append(" ").append(a);
-        }
-        return builder.append(ClassElements.END_BRACKET).toString();
-    }
-
-    private String aliased(String name) {
-        return name + FACTORY_ARG_SUFFIX;
-    }
-
-    private String resultSetInvocation(String type, String key) {
-        return new StringBuilder()
-            .append(RESULT_SET_ARG_NAME).append(ClassElements.DOT).append("get")
-            .append(ClassElements.capitalized(TYPE_RESULT_SET_TYPE.getOrDefault(type, type)))
-            .append(ClassElements.START_BRACKET)
-            .append(key)
-            .append(ClassElements.END_BRACKET)
-            .toString();
-    }
-
-    private String fieldInitialization(String field, String value) {
-        return new StringBuilder().append(ClassElements.DOUBLE_TAB)
-            .append(field).append(SPACED_EQUAL).append(value).append(ClassElements.SEMICOLON)
             .toString();
     }
 }

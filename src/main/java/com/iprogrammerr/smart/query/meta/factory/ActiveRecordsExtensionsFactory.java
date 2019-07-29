@@ -5,6 +5,7 @@ import com.iprogrammerr.smart.query.meta.data.MetaId;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +16,8 @@ public class ActiveRecordsExtensionsFactory {
     private static final int NEXT_LINE_SUPER_CALL_TABS = 3;
     private static final List<String> IMPORTS = Arrays.asList("import com.iprogrammerr.smart.query.QueryFactory;",
         "import com.iprogrammerr.smart.query.active.ActiveRecord;",
-        "import com.iprogrammerr.smart.query.active.UpdateableColumn;");
+        "import com.iprogrammerr.smart.query.active.UpdateableColumn;",
+        "import com.iprogrammerr.smart.query.mapping.Mappings;");
     private static final String OVERRIDE = "@Override";
     private static final String QUERY_FACTORY = "QueryFactory";
     private static final String QUERY_FACTORY_ARG = "factory";
@@ -29,7 +31,7 @@ public class ActiveRecordsExtensionsFactory {
     public String newExtension(MetaData meta, MetaId metaId) {
         String idType = idType(meta, metaId.name);
         return new StringBuilder()
-            .append(ClassElements.prolog(packageName, IMPORTS))
+            .append(ClassElements.prolog(packageName, Collections.singletonList(IMPORTS)))
             .append(ClassElements.EMPTY_LINE)
             .append(header(meta, idType))
             .append(ClassElements.EMPTY_LINE)
@@ -128,15 +130,15 @@ public class ActiveRecordsExtensionsFactory {
             .append(ClassElements.PUBLIC_MODIFIER).append(" ").append(meta.className).append(" fetch() ")
             .append(ClassElements.START_CURLY_BRACKET)
             .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append("return ").append(PARENT_FETCH)
-            .append(".fetch(r -> ").append(ClassElements.START_CURLY_BRACKET)
-            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append(ClassElements.TAB)
-            .append("r.next();")
-            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append(ClassElements.TAB).append("return ")
-            .append(meta.className).append(ClassElements.DOT).append(ClassElements.FACTORY_NAME).append("(r);")
-            .append(ClassElements.NEW_LINE).append(ClassElements.DOUBLE_TAB).append(ClassElements.END_CURLY_BRACKET)
+            .append(".fetch(")
+            .append(mappingsOf(meta.className))
             .append(ClassElements.END_BRACKET).append(ClassElements.SEMICOLON)
             .append(ClassElements.NEW_LINE).append(ClassElements.TAB).append(ClassElements.END_CURLY_BRACKET)
             .toString();
+    }
+
+    private String mappingsOf(String clazz) {
+        return String.format("Mappings.ofClass(%s.class)", clazz);
     }
 
     private String setters(MetaData data, MetaId metaId) {
