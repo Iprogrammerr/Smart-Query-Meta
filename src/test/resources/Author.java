@@ -40,4 +40,9 @@ public class Author {
         }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, surname, alias, alive);
+    }
 }

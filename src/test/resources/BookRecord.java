@@ -10,6 +10,7 @@ public class BookRecord extends ActiveRecord<Integer, Book> {
     public BookRecord(QueryFactory factory, Integer id) {
         super(factory, Book.TABLE, new UpdateableColumn<>(Book.ID, id), Integer.class, true,
             new UpdateableColumn<>(Book.AUTHOR_ID), new UpdateableColumn<>(Book.TITLE),
+            new UpdateableColumn<>(Book.PAGES), new UpdateableColumn<>(Book.LANGUAGE),
             new UpdateableColumn<>(Book.YEAR_OF_PUBLICATION));
     }
 
@@ -29,6 +30,16 @@ public class BookRecord extends ActiveRecord<Integer, Book> {
 
     public BookRecord setTitle(String title) {
         set(Book.TITLE, title);
+        return this;
+    }
+
+    public BookRecord setPages(Integer pages) {
+        set(Book.PAGES, pages);
+        return this;
+    }
+
+    public BookRecord setLanguage(String language) {
+        set(Book.LANGUAGE, language);
         return this;
     }
 

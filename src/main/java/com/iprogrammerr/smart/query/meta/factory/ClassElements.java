@@ -96,7 +96,11 @@ public class ClassElements {
         return builder.toString();
     }
 
+    public static String argsInLines(int firstLineOffset, List<String> args, int tabs) {
+        return argsInLines(firstLineOffset, args, MAX_LINE_LENGTH, tabs);
+    }
+
     public static String argsInLines(int firstLineOffset, List<String> args) {
-        return argsInLines(firstLineOffset, args, MAX_LINE_LENGTH, 2);
+        return argsInLines(firstLineOffset, args, 2);
     }
 }

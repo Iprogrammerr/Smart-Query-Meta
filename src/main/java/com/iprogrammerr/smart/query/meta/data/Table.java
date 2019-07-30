@@ -25,4 +25,12 @@ public class Table {
     public int hashCode() {
         return Objects.hash(name, metaId);
     }
+
+    @Override
+    public String toString() {
+        return "Table{" +
+            "name='" + name + '\'' +
+            ", metaId=" + metaId +
+            '}';
+    }
 }

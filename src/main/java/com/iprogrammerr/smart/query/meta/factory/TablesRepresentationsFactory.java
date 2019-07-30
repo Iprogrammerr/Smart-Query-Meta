@@ -26,6 +26,7 @@ public class TablesRepresentationsFactory {
     private static final String EQUALS_ARG = "object";
     private static final String EQUALS_CASTED_ARG = "other";
     private static final String AND = "&&";
+    private static final int HASH_CODE_NEXT_LINE_TABS = 3;
     private static final Set<String> PRIMITIVES = new HashSet<>();
 
     static {
@@ -54,6 +55,8 @@ public class TablesRepresentationsFactory {
             .append(constructor(data.className, data.fieldsTypes))
             .append(ClassElements.EMPTY_LINE)
             .append(equalsImplementation(data))
+            .append(ClassElements.EMPTY_LINE)
+            .append(hashCodeImplementation(data))
             .append(ClassElements.NEW_LINE).append(ClassElements.END_CURLY_BRACKET)
             .toString();
     }
@@ -215,5 +218,21 @@ public class TablesRepresentationsFactory {
 
     private String callReturn(String arg) {
         return String.format("return %s;", arg);
+    }
+
+    private String hashCodeImplementation(MetaData data) {
+        StringBuilder builder = new StringBuilder()
+            .append(ClassElements.TAB).append(OVERRIDE_ANNOTATION)
+            .append(ClassElements.NEW_LINE)
+            .append(ClassElements.TAB).append(ClassElements.PUBLIC_MODIFIER)
+            .append(" int hashCode() ").append(ClassElements.START_CURLY_BRACKET)
+            .append(ClassElements.NEW_LINE);
+        int length = builder.length();
+        builder.append(ClassElements.DOUBLE_TAB).append("return Objects.hash(");
+        List<String> args = new ArrayList<>(data.fieldsTypes.keySet());
+        return builder.append(ClassElements.argsInLines(builder.length() - length, args, HASH_CODE_NEXT_LINE_TABS))
+            .append(");").append(ClassElements.NEW_LINE).append(ClassElements.TAB)
+            .append(ClassElements.END_CURLY_BRACKET)
+            .toString();
     }
 }

@@ -28,4 +28,13 @@ public class MetaId {
     public int hashCode() {
         return Objects.hash(name, autoIncrement, composite);
     }
+
+    @Override
+    public String toString() {
+        return "MetaId{" +
+            "name='" + name + '\'' +
+            ", autoIncrement=" + autoIncrement +
+            ", composite=" + composite +
+            '}';
+    }
 }

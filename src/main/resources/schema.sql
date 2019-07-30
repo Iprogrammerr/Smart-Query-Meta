@@ -13,6 +13,8 @@ CREATE TABLE book (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	author_id INT UNSIGNED NOT NULL,
 	title VARCHAR(100) NOT NULL UNIQUE,
+	pages INT UNSIGNED NOT NULL,
+	language VARCHAR(50) NOT NULL,
 	year_of_publication INT UNSIGNED NOT NULL,
 	PRIMARY KEY (id),
 	FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE CASCADE
@@ -33,3 +35,11 @@ CREATE TABLE user_book (
 	FOREIGN KEY (book_id) REFERENCES book(id) ON DELETE CASCADE,
 	PRIMARY KEY (user_id, book_id)
 );
+
+DROP TABLE IF EXISTS organism;
+CREATE TABLE organism (
+	dna VARCHAR(255) NOT NULL,
+	name VARCHAR(100),
+	PRIMARY KEY (dna)
+);
+

@@ -27,9 +27,12 @@ public class TablesTest {
         Table[] expected = {
             new Table("AUTHOR", new MetaId("ID", true, false)),
             new Table("BOOK", new MetaId("ID", true, false)),
-            new Table("ORGANISM", new MetaId("DNA", false, false))
+            new Table("USER", new MetaId("ID", true, false)),
+            new Table("USER_BOOK", new MetaId("BOOK_ID", false, true)),
+            new Table("ORGANISM", new MetaId("DNA", false, false)),
+
         };
         List<Table> actual = tables.all();
-        MatcherAssert.assertThat(actual, Matchers.contains(expected));
+        MatcherAssert.assertThat(actual, Matchers.containsInAnyOrder(expected));
     }
 }
