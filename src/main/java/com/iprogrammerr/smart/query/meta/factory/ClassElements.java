@@ -12,6 +12,7 @@ public class ClassElements {
     public static final String SPACE = " ";
     public static final String TAB = SPACE + SPACE + SPACE + SPACE;
     public static final String DOUBLE_TAB = TAB + TAB;
+    public static final String TRI_TAB = DOUBLE_TAB + TAB;
     public static final String NEW_LINE = "\n";
     public static final String EMPTY_LINE = NEW_LINE + NEW_LINE;
     public static final String START_BRACKET = "(";

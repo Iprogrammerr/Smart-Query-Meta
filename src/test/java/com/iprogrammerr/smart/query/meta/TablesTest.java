@@ -32,5 +32,4 @@ public class TablesTest {
         List<Table> actual = tables.all();
         MatcherAssert.assertThat(actual, Matchers.contains(expected));
     }
-
 }

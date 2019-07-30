@@ -2,6 +2,8 @@ package com.iprogrammerr.smart.query.meta.table;
 
 import com.iprogrammerr.smart.query.mapping.clazz.Mapping;
 
+import java.util.Objects;
+
 public class Book {
 
     public static final String TABLE = "book";
@@ -22,5 +24,20 @@ public class Book {
         this.authorId = authorId;
         this.title = title;
         this.yearOfPublication = yearOfPublication;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof Book) {
+            Book other = (Book) object;
+            return Objects.equals(id, other.id) &&
+                Objects.equals(authorId, other.authorId) &&
+                Objects.equals(title, other.title) &&
+                Objects.equals(yearOfPublication, other.yearOfPublication);
+        }
+        return false;
     }
 }
