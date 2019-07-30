@@ -10,9 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 public class MetaTableTest {
@@ -39,21 +37,20 @@ public class MetaTableTest {
 
     private MetaData authorMetaData() {
         Map<String, String> fieldsTypes = new HashMap<>();
-        fieldsTypes.put("id", "Integer");
+        fieldsTypes.put("id", "int");
         fieldsTypes.put("name", "String");
         fieldsTypes.put("surname", "String");
         fieldsTypes.put("alias", "String");
-        fieldsTypes.put("alive", "Byte");
+        fieldsTypes.put("alive", "byte");
         return new MetaData("AUTHOR", "Author", Arrays.asList("ID", "NAME",
-            "SURNAME", "ALIAS", "ALIVE"), fieldsTypes, new HashSet<>());
+            "SURNAME", "ALIAS", "ALIVE"), fieldsTypes);
     }
 
     private MetaData organismMetaData() {
         Map<String, String> fieldsTypes = new HashMap<>();
         fieldsTypes.put("dna", "String");
         fieldsTypes.put("name", "String");
-        return new MetaData("ORGANISM", "Organism", Arrays.asList("DNA", "NAME"), fieldsTypes,
-            Collections.singleton("name"));
+        return new MetaData("ORGANISM", "Organism", Arrays.asList("DNA", "NAME"), fieldsTypes);
     }
 
     @Test

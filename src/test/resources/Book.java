@@ -14,16 +14,16 @@ public class Book {
     public static final String LANGUAGE = "language";
     public static final String YEAR_OF_PUBLICATION = "year_of_publication";
 
-    public final Integer id;
+    public final int id;
     @Mapping(AUTHOR_ID)
-    public final Integer authorId;
+    public final int authorId;
     public final String title;
     public final Integer pages;
     public final String language;
     @Mapping(YEAR_OF_PUBLICATION)
-    public final Integer yearOfPublication;
+    public final int yearOfPublication;
 
-    public Book(Integer id, Integer authorId, String title, Integer pages, String language, Integer yearOfPublication) {
+    public Book(int id, int authorId, String title, Integer pages, String language, int yearOfPublication) {
         this.id = id;
         this.authorId = authorId;
         this.title = title;
@@ -39,12 +39,12 @@ public class Book {
         }
         if (object instanceof Book) {
             Book other = (Book) object;
-            return Objects.equals(id, other.id) &&
-                Objects.equals(authorId, other.authorId) &&
+            return id == other.id &&
+                authorId == other.authorId &&
                 Objects.equals(title, other.title) &&
                 Objects.equals(pages, other.pages) &&
                 Objects.equals(language, other.language) &&
-                Objects.equals(yearOfPublication, other.yearOfPublication);
+                yearOfPublication == other.yearOfPublication;
         }
         return false;
     }

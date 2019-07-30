@@ -37,7 +37,7 @@ public class AuthorRecord extends ActiveRecord<Integer, Author> {
         return this;
     }
 
-    public AuthorRecord setAlive(Byte alive) {
+    public AuthorRecord setAlive(byte alive) {
         set(Author.ALIVE, alive);
         return this;
     }

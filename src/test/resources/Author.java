@@ -11,13 +11,13 @@ public class Author {
     public static final String ALIAS = "alias";
     public static final String ALIVE = "alive";
 
-    public final Integer id;
+    public final int id;
     public final String name;
     public final String surname;
     public final String alias;
-    public final Byte alive;
+    public final byte alive;
 
-    public Author(Integer id, String name, String surname, String alias, Byte alive) {
+    public Author(int id, String name, String surname, String alias, byte alive) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -32,11 +32,11 @@ public class Author {
         }
         if (object instanceof Author) {
             Author other = (Author) object;
-            return Objects.equals(id, other.id) &&
+            return id == other.id &&
                 Objects.equals(name, other.name) &&
                 Objects.equals(surname, other.surname) &&
                 Objects.equals(alias, other.alias) &&
-                Objects.equals(alive, other.alive);
+                alive == other.alive;
         }
         return false;
     }

@@ -23,7 +23,7 @@ public class BookRecord extends ActiveRecord<Integer, Book> {
         return fetchQuery().fetch(Mappings.ofClass(Book.class));
     }
 
-    public BookRecord setAuthorId(Integer authorId) {
+    public BookRecord setAuthorId(int authorId) {
         set(Book.AUTHOR_ID, authorId);
         return this;
     }
@@ -43,7 +43,7 @@ public class BookRecord extends ActiveRecord<Integer, Book> {
         return this;
     }
 
-    public BookRecord setYearOfPublication(Integer yearOfPublication) {
+    public BookRecord setYearOfPublication(int yearOfPublication) {
         set(Book.YEAR_OF_PUBLICATION, yearOfPublication);
         return this;
     }

@@ -2,10 +2,12 @@ package com.iprogrammerr.smart.query.meta.factory;
 
 import com.iprogrammerr.smart.query.meta.data.MetaData;
 import com.iprogrammerr.smart.query.meta.data.MetaId;
+import com.iprogrammerr.smart.query.meta.data.Primitive;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +24,19 @@ public class ActiveRecordsExtensionsFactory {
     private static final String QUERY_FACTORY = "QueryFactory";
     private static final String QUERY_FACTORY_ARG = "factory";
     private static final String PARENT_FETCH = "fetchQuery()";
+    private static final Map<String, String> PRIMITIVES_TRANSLATIONS = new HashMap<>();
+
+    static {
+        for (Primitive p : Primitive.values()) {
+            String n = p.name().toLowerCase();
+            if (p == Primitive.INT) {
+                PRIMITIVES_TRANSLATIONS.put(n, Primitive.INTEGER);
+            } else {
+                PRIMITIVES_TRANSLATIONS.put(n, ClassElements.capitalized(n));
+            }
+        }
+    }
+
     private final String packageName;
 
     public ActiveRecordsExtensionsFactory(String packageName) {
@@ -30,12 +45,13 @@ public class ActiveRecordsExtensionsFactory {
 
     public String newExtension(MetaData meta, MetaId metaId) {
         String idType = idType(meta, metaId.name);
+        String idClassType = PRIMITIVES_TRANSLATIONS.getOrDefault(idType, idType);
         return new StringBuilder()
             .append(ClassElements.prolog(packageName, Collections.singletonList(IMPORTS)))
             .append(ClassElements.EMPTY_LINE)
-            .append(header(meta, idType))
+            .append(header(meta, idClassType))
             .append(ClassElements.EMPTY_LINE)
-            .append(constructors(meta, metaId, idType))
+            .append(constructors(meta, metaId, idClassType))
             .append(ClassElements.EMPTY_LINE)
             .append(ClassElements.TAB).append(OVERRIDE)
             .append(ClassElements.NEW_LINE).append(ClassElements.TAB)

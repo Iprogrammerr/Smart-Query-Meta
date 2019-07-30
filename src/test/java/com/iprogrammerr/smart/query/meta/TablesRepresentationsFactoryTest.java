@@ -30,10 +30,21 @@ public class TablesRepresentationsFactoryTest {
 
     @Test
     public void generatesTables() throws Exception {
+        String author = "Author";
+        String book = "Book";
+        String user = "User";
         List<String> tables = new Tables(database.connection()).all().stream()
-            .map(t -> t.name).collect(Collectors.toList());
-        generatesTable(tables.get(0), "Author");
-        generatesTable(tables.get(1), "Book");
+            .map(t -> t.name)
+            .filter(t -> {
+                String lt = t.toLowerCase();
+                return lt.startsWith(author.toLowerCase()) || lt.startsWith(book.toLowerCase()) ||
+                    lt.startsWith(user.toLowerCase());
+            })
+            .sorted()
+            .collect(Collectors.toList());
+        generatesTable(tables.get(0), author);
+        generatesTable(tables.get(1), book);
+        generatesTable(tables.get(2), user);
     }
 
     private void generatesTable(String table, String className) throws Exception {

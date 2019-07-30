@@ -7,11 +7,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class MetaTable {
 
@@ -40,19 +38,29 @@ public class MetaTable {
     private MetaData dataFromResult(ResultSet result) throws Exception {
         List<String> columnLabels = new ArrayList<>();
         Map<String, String> fieldsTypes = new LinkedHashMap<>();
-        Set<String> nullableFields = new HashSet<>();
         ResultSetMetaData meta = result.getMetaData();
         for (int i = 1; i <= meta.getColumnCount(); i++) {
             String label = meta.getColumnLabel(i);
             columnLabels.add(label);
             String field = ClassElements.toCamelCase(label);
             String type = typeName(meta.getColumnClassName(i));
-            fieldsTypes.put(field, type);
-            if (meta.isNullable(i) == ResultSetMetaData.columnNullable) {
-                nullableFields.add(field);
+            if (meta.isNullable(i) == ResultSetMetaData.columnNoNulls) {
+                type = nonNullableType(type);
             }
+            fieldsTypes.put(field, type);
         }
-        return new MetaData(table, ClassElements.toPascalCase(table), columnLabels, fieldsTypes, nullableFields);
+        return new MetaData(table, ClassElements.toPascalCase(table), columnLabels, fieldsTypes);
+    }
+
+    private String nonNullableType(String type) {
+        Primitive primitive = Primitive.translate(type);
+        String converted;
+        if (primitive == Primitive.UNKNOWN) {
+            converted = type;
+        } else {
+            converted = primitive.name().toLowerCase();
+        }
+        return converted;
     }
 
     private String typeName(String className) {
