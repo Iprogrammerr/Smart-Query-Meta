@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/Iprogrammerr/Smart-Query-Meta.svg?branch=master)](https://travis-ci.com/Iprogrammerr/Smart-Query-Meta)
 [![Test Coverage](https://img.shields.io/codecov/c/github/iprogrammerr/smart-query-meta/master.svg)](https://codecov.io/gh/Iprogrammerr/Smart-Query-Meta/branch/master)
 # Smart Query Meta
-SQL tables representation and ActiveRecord extensions generator based on database connection.
+SQL tables representation and ActiveRecord extensions generator based on database connection. Designed to be used with [Smart Query.](https://github.com/Iprogrammerr/Smart-Query)
 ## Usage
 ### Jar
 ```
@@ -24,7 +24,7 @@ generateActiveRecords=true
 <plugin>
     <groupId>com.iprogrammerr</groupId>
     <artifactId>smart-query-meta</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
     <configuration>
         <jdbcUrl>jdbc:mysql://localhost:3306/database</jdbcUrl>
         <databaseUser>root</databaseUser>
@@ -51,7 +51,6 @@ mvn meta:generate
 Schema:
 ```
 DROP TABLE IF EXISTS author;
-
 CREATE TABLE author (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE,
@@ -62,11 +61,12 @@ CREATE TABLE author (
 );
 
 DROP TABLE IF EXISTS book;
-
 CREATE TABLE book (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     author_id INT UNSIGNED NOT NULL,
     title VARCHAR(100) NOT NULL UNIQUE,
+    pages INT UNSIGNED,
+    language VARCHAR(50) NOT NULL,
     year_of_publication INT UNSIGNED NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE CASCADE
@@ -76,26 +76,24 @@ Tables:
 ```java
 package com.iprogrammerr.smart.query.meta.table;
 
-import java.sql.ResultSet;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Objects;
 
-public class Author { 
-    
-    public static final String TABLE = "AUTHOR";
+public class Author {
+
+    public static final String TABLE = "author";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String SURNAME = "surname";
     public static final String ALIAS = "alias";
     public static final String ALIVE = "alive";
 
-    public final Integer id;
+    public final int id;
     public final String name;
     public final String surname;
     public final String alias;
-    public final Byte alive;
+    public final byte alive;
 
-    public Author(int id, String name, String surname, String alias, Byte alive) {
+    public Author(int id, String name, String surname, String alias, byte alive) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -103,84 +101,82 @@ public class Author {
         this.alive = alive;
     }
 
-    public static Author fromResult(ResultSet result, String idLabel, String nameLabel, String surnameLabel, 
-        String aliasLabel, String aliveLabel) throws Exception {
-        Integer id = result.getInt(idLabel);
-        String name = result.getString(nameLabel);
-        String surname = result.getString(surnameLabel);
-        String alias = result.getString(aliasLabel);
-        Byte alive = result.getByte(aliveLabel);
-        return new Author(id, name, surname, alias, alive);
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof Author) {
+            Author other = (Author) object;
+            return id == other.id &&
+                Objects.equals(name, other.name) &&
+                Objects.equals(surname, other.surname) &&
+                Objects.equals(alias, other.alias) &&
+                alive == other.alive;
+        }
+        return false;
     }
-    
-    public static Author fromResult(ResultSet result) throws Exception {
-        return fromResult(result, ID, NAME, SURNAME, ALIAS, ALIVE);
-    }
-    
-    public static List<Author> listFromResult(ResultSet result, String idLabel, String nameLabel, String surnameLabel, 
-        String aliasLabel, String aliveLabel) throws Exception {
-        List<Author> list = new ArrayList<>();
-        do {
-            list.add(fromResult(result, idLabel, nameLabel, surnameLabel, aliasLabel, aliveLabel));
-        } while (result.next());
-        return list;
-    }
-    
-    public static List<Author> listFromResult(ResultSet result) throws Exception {
-        return fromListResult(result, ID, NAME, SURNAME, ALIAS, ALIVE);
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, surname, alias, alive);
     }
 }
 
 package com.iprogrammerr.smart.query.meta.table;
 
-import java.sql.ResultSet;
-import java.util.List;
-import java.util.ArrayList;
+import com.iprogrammerr.smart.query.mapping.clazz.Mapping;
+
+import java.util.Objects;
 
 public class Book {
 
-    public static final String TABLE = "BOOK";
+    public static final String TABLE = "book";
     public static final String ID = "id";
     public static final String AUTHOR_ID = "author_id";
     public static final String TITLE = "title";
+    public static final String PAGES = "pages";
+    public static final String LANGUAGE = "language";
     public static final String YEAR_OF_PUBLICATION = "year_of_publication";
 
-    public final Integer id;
-    public final Integer authorId;
+    public final int id;
+    @Mapping(AUTHOR_ID)
+    public final int authorId;
     public final String title;
-    public final Integer yearOfPublication;
+    public final Integer pages;
+    public final String language;
+    @Mapping(YEAR_OF_PUBLICATION)
+    public final int yearOfPublication;
 
-    public Book(Integer id, Integer authorId, String title, Integer yearOfPublication) {
+    public Book(int id, int authorId, String title, Integer pages, String language, int yearOfPublication) {
         this.id = id;
         this.authorId = authorId;
         this.title = title;
-        this.yearOfPublication = yearOfPublication;     
+        this.pages = pages;
+        this.language = language;
+        this.yearOfPublication = yearOfPublication;
     }
 
-    public static Book fromResult(ResultSet result, String idLabel, String authorIdLabel, String titleLabel, 
-		String yearOfPublicationLabel) throws Exception {
-        Integer id = result.getInt(idLabel);
-        Integer authorId = result.getInt(authorIdLabel);
-        String title = result.getString(titleLabel);
-        Integer yearOfPublication = result.getInt(yearOfPublicationLabel);
-        return new Book(id, authorId, title, yearOfPublication);
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object instanceof Book) {
+            Book other = (Book) object;
+            return id == other.id &&
+                authorId == other.authorId &&
+                Objects.equals(title, other.title) &&
+                Objects.equals(pages, other.pages) &&
+                Objects.equals(language, other.language) &&
+                yearOfPublication == other.yearOfPublication;
+        }
+        return false;
     }
 
-    public static Book fromResult(ResultSet result) throws Exception {
-        return fromResult(result, ID, AUTHOR_ID, TITLE, YEAR_OF_PUBLICATION);
-    }
-
-    public static List<Book> listFromResult(ResultSet result, String idLabel, String authorIdLabel, String titleLabel, 
-	   	String yearOfPublicationLabel) throws Exception {
-        List<Book> list = new ArrayList<>();
-        do {
-            list.add(fromResult(result, idLabel, authorIdLabel, titleLabel, yearOfPublicationLabel));
-        } while (result.next());
-        return list;
-    }
-
-    public static List<Book> listFromResult(ResultSet result) throws Exception {
-        return fromListResult(result, ID, AUTHOR_ID, TITLE, YEAR_OF_PUBLICATION);
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, authorId, title, pages, language, yearOfPublication);
     }
 }
 ```
@@ -191,45 +187,43 @@ package com.iprogrammerr.smart.query.meta.table;
 import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.active.ActiveRecord;
 import com.iprogrammerr.smart.query.active.UpdateableColumn;
+import com.iprogrammerr.smart.query.mapping.Mappings;
 
-public class AuthorRecord extends ActiveRecord<Integer, Author> { 
-    
+public class AuthorRecord extends ActiveRecord<Integer, Author> {
+
     public AuthorRecord(QueryFactory factory, Integer id) {
-        super(factory, Author.TABLE, new UpdateableColumn<>(Author.ID, id), Integer.class, true, 
-            new UpdateableColumn<>(Author.NAME), new UpdateableColumn<>(Author.SURNAME), 
-            new UpdateableColumn<>(Author.ALIAS), new UpdateableColumn<>(Author.ALIVE)); 
+        super(factory, Author.TABLE, new UpdateableColumn<>(Author.ID, id), Integer.class, true,
+            new UpdateableColumn<>(Author.NAME), new UpdateableColumn<>(Author.SURNAME),
+            new UpdateableColumn<>(Author.ALIAS), new UpdateableColumn<>(Author.ALIVE));
     }
-	
-    public AuthorRecord(QueryFactory factory) { 
-        this(factory, null); 
+
+    public AuthorRecord(QueryFactory factory) {
+        this(factory, null);
     }
-    
+
     @Override
-    public Author fetch() { 
-        return fetchQuery().fetch(r -> {
-            r.next();
-            return Author.fromResult(r); 
-        }); 
+    public Author fetch() {
+        return fetchQuery().fetch(Mappings.ofClass(Author.class));
     }
-    
+
     public AuthorRecord setName(String name) {
         set(Author.NAME, name);
-        return this; 
+        return this;
     }
-    
-    public AuthorRecord setSurname(String surname) { 
+
+    public AuthorRecord setSurname(String surname) {
         set(Author.SURNAME, surname);
-        return this; 
+        return this;
     }
 
-    public AuthorRecord setAlias(String alias) { 
+    public AuthorRecord setAlias(String alias) {
         set(Author.ALIAS, alias);
-        return this; 
+        return this;
     }
 
-    public AuthorRecord setAlive(Byte alive) {  
+    public AuthorRecord setAlive(byte alive) {
         set(Author.ALIVE, alive);
-        return this;    
+        return this;
     }
 }
 
@@ -238,44 +232,53 @@ package com.iprogrammerr.smart.query.meta.table;
 import com.iprogrammerr.smart.query.QueryFactory;
 import com.iprogrammerr.smart.query.active.ActiveRecord;
 import com.iprogrammerr.smart.query.active.UpdateableColumn;
+import com.iprogrammerr.smart.query.mapping.Mappings;
 
-public class BookRecord extends ActiveRecord<Integer, Book> { 
+public class BookRecord extends ActiveRecord<Integer, Book> {
 
     public BookRecord(QueryFactory factory, Integer id) {
-	     super(factory, Book.TABLE, new UpdateableColumn<>(Book.ID, id), Integer.class, true, 
-	        new UpdateableColumn<>(Book.AUTHOR_ID), new UpdateableColumn<>(Book.TITLE), 
-	        new UpdateableColumn<>(Book.YEAR_OF_PUBLICATION)); 
+        super(factory, Book.TABLE, new UpdateableColumn<>(Book.ID, id), Integer.class, true,
+            new UpdateableColumn<>(Book.AUTHOR_ID), new UpdateableColumn<>(Book.TITLE),
+            new UpdateableColumn<>(Book.PAGES), new UpdateableColumn<>(Book.LANGUAGE),
+            new UpdateableColumn<>(Book.YEAR_OF_PUBLICATION));
     }
 
-    public BookRecord(QueryFactory factory) { 
-        this(factory, null); 
+    public BookRecord(QueryFactory factory) {
+        this(factory, null);
     }
 
     @Override
-    public Book fetch() { 
-        return fetchQuery().fetch(r -> {
-            r.next();
-            return Book.fromResult(r); 
-        });     
+    public Book fetch() {
+        return fetchQuery().fetch(Mappings.ofClass(Book.class));
     }
-    
-    public BookRecord setAuthorId(Integer authorId) { 
+
+    public BookRecord setAuthorId(int authorId) {
         set(Book.AUTHOR_ID, authorId);
-        return this; 
+        return this;
     }
 
-    public BookRecord setTitle(String title) { 
+    public BookRecord setTitle(String title) {
         set(Book.TITLE, title);
-        return this; 
+        return this;
     }
 
-    public BookRecord setYearOfPublication(Integer yearOfPublication) {     
+    public BookRecord setPages(Integer pages) {
+        set(Book.PAGES, pages);
+        return this;
+    }
+
+    public BookRecord setLanguage(String language) {
+        set(Book.LANGUAGE, language);
+        return this;
+    }
+
+    public BookRecord setYearOfPublication(int yearOfPublication) {
         set(Book.YEAR_OF_PUBLICATION, yearOfPublication);
-        return this; 
+        return this;
     }
 }
 ```
-Using [Smart Query:](https://github.com/Iprogrammerr/Smart-Query)
+Note that only nullable fields are generated as non-primitives. ActiveRecord extensions also don't allow to set id of autoincrement type. Using [Smart Query:](https://github.com/Iprogrammerr/Smart-Query)
 ```java
 long id = queryFactory.newQuery().dsl()
     .insertInto(Author.TABLE)
@@ -287,18 +290,12 @@ long id = queryFactory.newQuery().dsl()
 Author author = queryFactory.newQuery().dsl()
     .selectAll().from(Author.TABLE).where(Author.ID).equal().value(id)
     .query()
-    .fetch(r -> {
-        r.next();
-        return Author.fromResult(r);
-    });
+    .fetch(Mappings.ofClass(Authror.class));
         
 List<Book> books = queryFactory.newQuery().dsl()
     .selectAll().from(Book.TABLE).where(Book.AUTHOR_ID).equal().value(id)
     .query()
-    .fetch(r -> {
-        r.next();
-        return Book.listFromResult(r);
-    });
+    .fetch(Mappings.listOfClass(Book.class));
 
 AuthorRecord record = new AuthorRecord(queryFactory)
     .setName("Lem")
