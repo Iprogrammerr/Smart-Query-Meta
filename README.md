@@ -290,7 +290,7 @@ long id = queryFactory.newQuery().dsl()
 Author author = queryFactory.newQuery().dsl()
     .selectAll().from(Author.TABLE).where(Author.ID).equal().value(id)
     .query()
-    .fetch(Mappings.ofClass(Authror.class));
+    .fetch(Mappings.ofClass(Author.class));
         
 List<Book> books = queryFactory.newQuery().dsl()
     .selectAll().from(Book.TABLE).where(Book.AUTHOR_ID).equal().value(id)
